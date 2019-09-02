@@ -2,47 +2,41 @@
 import {
   Scene,
   PerspectiveCamera,
-  WebGLRenderer,
-  BoxGeometry,
-  MeshBasicMaterial,
-  Mesh
+  WebGLRenderer
 } from 'three';
 import {
-  GLTFLoader
-} from 'three/examples/jsm/loaders/GLTFLoader';
-// Create scene, camera and renderer
+  OrbitControls
+} from 'three/examples/jsm/controls/OrbitControls.js';
+// Custom Imports
+import {
+  MarsEnvironment
+} from './env.js';
+import {
+  RoverAgent
+} from './agent.js';
+
+// Create basic ThreeJS objects: scene, camera, controls and renderer
 const scene = new Scene();
 const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new WebGLRenderer();
+const controls = new OrbitControls( camera, renderer.domElement );
 // Bind renderer to html
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// Instantiate a loader
-var loader = new GLTFLoader();
+// Set camera position
+camera.position.z = 10;
+camera.position.y = 10;
+// Instantiate Environment
+const env = new MarsEnvironment(1, 1, scene);
+// Instantiate Agent?
+const agent = new RoverAgent(scene);
 
-loader.load('assets/rover.glb', function(gltf) {
-  scene.add(gltf.scene);
-}, undefined, function(error) {
-  console.error(error);
-});
-
-// Cube example for now, replace with env and agent
-const geometry = new BoxGeometry(1, 1, 1);
-const material = new MeshBasicMaterial({
-  color: 0x00ff00
-});
-const cube = new Mesh(geometry, material);
-scene.add(cube);
-
-camera.position.z = 5;
-
+// animate the scene
 const animate = function() {
   requestAnimationFrame(animate);
-
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
-
+  // Call to env animate
+  env.animate();
   renderer.render(scene, camera);
 };
 
