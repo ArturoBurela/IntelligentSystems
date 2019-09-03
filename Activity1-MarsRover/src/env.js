@@ -4,39 +4,67 @@ import {
   BoxGeometry,
   MeshBasicMaterial,
   Mesh,
-  HemisphereLight,
-  HemisphereLightHelper,
   Color,
   Fog,
-  PlaneBufferGeometry,
-  MeshLambertMaterial,
+  RepeatWrapping,
   SphereBufferGeometry,
   ShaderMaterial,
-  BackSide
+  BackSide,
+  AmbientLight,
+  MeshLambertMaterial,
+  PlaneBufferGeometry,
+  TextureLoader
 } from 'three';
+
+import {
+  GLTFLoader
+} from 'three/examples/jsm/loaders/GLTFLoader';
+
+const BACKGROUND_COLOR = 0x000000;
 
 class MarsEnvironment {
   constructor(numRocks, numObstacles, scene) {
-    this.height = 1;
-    this.width = 1;
+    this.numRocks = numRocks;
+    this.numObstacles = numObstacles;
     this.scene = scene;
     this.addLights();
     this.addGround();
-    this.addSky();
+    this.addMarsBase();
+    // this.addSky();
     this.createPlane();
   }
 
-  addGround() {
-    const groundGeo = new PlaneBufferGeometry(10000, 10000);
-    const groundMat = new MeshLambertMaterial({
-      color: 0xffffff
+  addMarsBase() {
+    this.loader = new GLTFLoader();
+    const ctx = this;
+    this.loader.load('assets/mars_base/scene.gltf', function(gltf) {
+      console.log(gltf);
+      ctx.scene.add(gltf.scene);
+    }, undefined, function(error) {
+      console.error(error);
     });
-    groundMat.color.setHSL(0.095, 1, 0.75);
-    const ground = new Mesh(groundGeo, groundMat);
-    ground.position.y = 0;
-    ground.rotation.x = -Math.PI / 2;
-    ground.receiveShadow = true;
-    this.scene.add(ground);
+  }
+
+  addLights() {
+    this.scene.background = new Color(BACKGROUND_COLOR);
+    // this.scene.fog = new Fog(0x0f0f0f, 100, 800);
+    this.scene.add(new AmbientLight(0xee2400));
+  }
+
+  addGround() {
+    var loader = new TextureLoader();
+    var groundTexture = loader.load('assets/surface.jpg');
+    groundTexture.wrapS = groundTexture.wrapT = RepeatWrapping;
+    groundTexture.repeat.set(100, 100);
+    groundTexture.anisotropy = 16;
+    var groundMaterial = new MeshLambertMaterial({
+      map: groundTexture
+    });
+    var mesh = new Mesh(new PlaneBufferGeometry(20000, 20000), groundMaterial);
+    mesh.position.y = 0;
+    mesh.rotation.x = -Math.PI / 2;
+    mesh.receiveShadow = true;
+    this.scene.add(mesh);
   }
 
   addSky() {
@@ -67,18 +95,6 @@ class MarsEnvironment {
     });
     var sky = new Mesh(skyGeo, skyMat);
     this.scene.add(sky);
-  }
-
-  addLights() {
-    this.scene.background = new Color().setHSL(0.6, 0, 1);
-    this.scene.fog = new Fog(this.scene.background, 1, 5000);
-    this.hemiLight = new HemisphereLight(0xffffff, 0xffffff, 0.6);
-    this.hemiLight.color.setHSL(0.6, 1, 0.6);
-    this.hemiLight.groundColor.setHSL(0.095, 1, 0.75);
-    this.hemiLight.position.set(0, 50, 0);
-    this.scene.add(this.hemiLight);
-    this.hemiLightHelper = new HemisphereLightHelper(this.hemiLight, 10);
-    this.scene.add(this.hemiLightHelper);
   }
 
   createPlane() {

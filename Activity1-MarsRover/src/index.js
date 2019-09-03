@@ -2,7 +2,8 @@
 import {
   Scene,
   PerspectiveCamera,
-  WebGLRenderer
+  WebGLRenderer,
+  Stats
 } from 'three';
 import {
   OrbitControls
@@ -17,8 +18,8 @@ import {
 
 // Create basic ThreeJS objects: scene, camera, controls and renderer
 const scene = new Scene();
-const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new WebGLRenderer();
+const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
+const renderer = new WebGLRenderer({ antialias: true });
 const controls = new OrbitControls( camera, renderer.domElement );
 // Bind renderer to html
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -27,6 +28,24 @@ document.body.appendChild(renderer.domElement);
 // Set camera position
 camera.position.z = 10;
 camera.position.y = 10;
+
+// renderer
+renderer.setPixelRatio( window.devicePixelRatio );
+renderer.setSize( window.innerWidth, window.innerHeight );
+// container.appendChild( renderer.domElement );
+renderer.gammaInput = true;
+renderer.gammaOutput = true;
+renderer.shadowMap.enabled = true;
+// controls
+controls.maxPolarAngle = Math.PI * 0.4;
+controls.minDistance = 10;
+// controls.maxDistance = 500;
+// performance monitor
+// stats = new Stats();
+// container.appendChild( stats.dom );
+//
+// window.addEventListener( 'resize', onWindowResize, false );
+
 // Instantiate Environment
 const env = new MarsEnvironment(1, 1, scene);
 // Instantiate Agent?
