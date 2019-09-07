@@ -15,6 +15,9 @@ class RoverAgent {
   addAgent() {
     const ctx = this;
     this.loader.load('assets/rover.glb', function(gltf) {
+      gltf.scene.position.z = -300;
+      gltf.scene.position.y += 200;
+      gltf.scene.scale.addScalar(5);
       ctx.scene.add(gltf.scene);
     }, undefined, function(error) {
       console.error(error);

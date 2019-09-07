@@ -21,6 +21,9 @@ import {
 } from 'three/examples/jsm/loaders/GLTFLoader';
 
 const BACKGROUND_COLOR = 0x000000;
+const AMBIENT_COLOR = 0x000000;
+const FOG_COLOR = 0x000000;
+
 
 class MarsEnvironment {
   constructor(numRocks, numObstacles, scene) {
@@ -28,9 +31,9 @@ class MarsEnvironment {
     this.numObstacles = numObstacles;
     this.scene = scene;
     this.addLights();
-    this.addGround();
+    // this.addGround();
+    this.addSky();
     this.addMarsBase();
-    // this.addSky();
     this.createPlane();
   }
 
@@ -47,20 +50,20 @@ class MarsEnvironment {
 
   addLights() {
     this.scene.background = new Color(BACKGROUND_COLOR);
-    // this.scene.fog = new Fog(0x0f0f0f, 100, 800);
+    this.scene.fog = new Fog(0x0f0f0f, 100, 3500);
     this.scene.add(new AmbientLight(0xee2400));
   }
 
   addGround() {
-    var loader = new TextureLoader();
-    var groundTexture = loader.load('assets/surface.jpg');
+    const loader = new TextureLoader();
+    const groundTexture = loader.load('assets/surface.jpg');
     groundTexture.wrapS = groundTexture.wrapT = RepeatWrapping;
     groundTexture.repeat.set(100, 100);
     groundTexture.anisotropy = 16;
-    var groundMaterial = new MeshLambertMaterial({
+    const groundMaterial = new MeshLambertMaterial({
       map: groundTexture
     });
-    var mesh = new Mesh(new PlaneBufferGeometry(20000, 20000), groundMaterial);
+    const mesh = new Mesh(new PlaneBufferGeometry(20000, 20000), groundMaterial);
     mesh.position.y = 0;
     mesh.rotation.x = -Math.PI / 2;
     mesh.receiveShadow = true;
@@ -68,14 +71,14 @@ class MarsEnvironment {
   }
 
   addSky() {
-    var vertexShader = document.getElementById('vertexShader').textContent;
-    var fragmentShader = document.getElementById('fragmentShader').textContent;
-    var uniforms = {
+    const vertexShader = document.getElementById('vertexShader').textContent;
+    const fragmentShader = document.getElementById('fragmentShader').textContent;
+    const uniforms = {
       "topColor": {
-        value: new Color(0x0077ff)
+        value: new Color(0x000000)
       },
       "bottomColor": {
-        value: new Color(0xffffff)
+        value: new Color(0xcc501e)
       },
       "offset": {
         value: 33
@@ -84,16 +87,16 @@ class MarsEnvironment {
         value: 0.6
       }
     };
-    uniforms["topColor"].value.copy(this.hemiLight.color);
+    // uniforms["topColor"].value.copy(0xee2400);
     this.scene.fog.color.copy(uniforms["bottomColor"].value);
-    var skyGeo = new SphereBufferGeometry(4000, 32, 15);
-    var skyMat = new ShaderMaterial({
+    const skyGeo = new SphereBufferGeometry(4000, 32, 15);
+    const skyMat = new ShaderMaterial({
       uniforms: uniforms,
       vertexShader: vertexShader,
       fragmentShader: fragmentShader,
       side: BackSide
     });
-    var sky = new Mesh(skyGeo, skyMat);
+    const sky = new Mesh(skyGeo, skyMat);
     this.scene.add(sky);
   }
 
@@ -103,8 +106,9 @@ class MarsEnvironment {
       color: 0x00ff00
     });
     this.cube = new Mesh(geometry, material);
-    this.cube.position.z = -5;
-    this.cube.position.y += 3;
+    this.cube.scale.addScalar(5);
+    this.cube.position.z = -200;
+    this.cube.position.y += 200;
     this.scene.add(this.cube);
   }
 
