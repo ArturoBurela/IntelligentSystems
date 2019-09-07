@@ -8,6 +8,8 @@ class RoverAgent {
     // Instantiate a loader GLTF is prefered
     this.loader = new GLTFLoader();
     this.addAgent();
+    this.hasStuff = false;
+    this.position = this.moveAgent();
   }
 
   addAgent() {
@@ -17,6 +19,10 @@ class RoverAgent {
     }, undefined, function(error) {
       console.error(error);
     });
+  }
+
+  moveAgent(){
+
   }
 }
 
