@@ -3,6 +3,7 @@ import {
   Scene,
   PerspectiveCamera,
   WebGLRenderer,
+  Clock
 } from 'three';
 import { WEBGL } from 'three/examples/jsm/WebGL.js';
 import {
@@ -22,6 +23,7 @@ const canvas = document.createElement( 'canvas' );
 const context = WEBGL.isWebGL2Available() ? canvas.getContext( 'webgl2', { alpha: false } ) : canvas.getContext();
 // Create basic ThreeJS objects: scene, camera, controls and renderer
 const scene = new Scene();
+var clock = new Clock();
 const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
 const renderer = new WebGLRenderer({ canvas: canvas, context: context });
 const controls = new OrbitControls( camera, renderer.domElement );
@@ -54,14 +56,28 @@ controls.maxDistance = 3500;
 const env = new MarsEnvironment(1, 1, scene);
 // Instantiate Agent?
 const agent = new RoverAgent(scene);
-
+let random = Math.random();
+let rotateRand = Math.random();
+let rotate = true;
 // animate the scene
 const animate = function() {
   requestAnimationFrame(animate);
   // Call to env animate
   env.animate();
   renderer.render(scene, camera);
-  // console.log(camera.position);
+  if (agent.modelAgent) {
+    agent.moveAgent(random);
+    if(Math.floor(clock.getElapsedTime()) % 10 === 0 && clock.getElapsedTime() > 1 && rotate){
+      rotate = false;
+      agent.rotateAgent(rotateRand);
+      rotateRand = Math.random();
+      random = Math.random();
+    } else if (Math.floor(clock.getElapsedTime()) % 10 === 0 && !rotate) {
+      rotate = false;
+    } else {
+      rotate = true;
+    }
+  }
 };
 
 animate();
