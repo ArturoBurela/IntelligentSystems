@@ -32,8 +32,9 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 // Set camera position
-camera.position.z = 500;
-camera.position.y = 500;
+// camera.position.z = 500;
+// camera.position.y = 500;
+camera.position.set(9.6,1242.3,-158.76);
 
 // renderer
 renderer.setPixelRatio( window.devicePixelRatio );
