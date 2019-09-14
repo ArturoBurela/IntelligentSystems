@@ -65,9 +65,11 @@ const animate = function() {
   requestAnimationFrame(animate);
   // Call to env animate
   env.animate();
+  agent.animate();
   renderer.render(scene, camera);
-  if (agent.modelAgent) {
+  if (agent.modelAgent && env.marsBase) {
     agent.moveAgent(random);
+    agent.updateBase(env.marsBase.collider);
     if(Math.floor(clock.getElapsedTime()) % 10 === 0 && clock.getElapsedTime() > 1 && rotate){
       rotate = false;
       agent.rotateAgent(rotateRand);

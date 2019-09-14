@@ -2,6 +2,8 @@
 
 import {
   BoxGeometry,
+  Box3,
+  Box3Helper,
   MeshBasicMaterial,
   Mesh,
   Color,
@@ -13,7 +15,8 @@ import {
   AmbientLight,
   MeshLambertMaterial,
   PlaneBufferGeometry,
-  TextureLoader
+  TextureLoader,
+  Vector3
 } from 'three';
 
 import {
@@ -35,14 +38,34 @@ class MarsEnvironment {
     this.addSky();
     this.addMarsBase();
     this.createPlane();
+    this.marsBase = null;
+    this.helperBox = null;
+    this.newBox = null;
+    this.vectors = [
+      new Vector3(-700, 200,0), 
+      new Vector3(700, 200,0), 
+      new Vector3(700, 200, -300), 
+      new Vector3(-700, 200, -300), 
+      new Vector3(-700, 200, 0),
+      new Vector3(700, 0, 0),
+      new Vector3(700, 0, -300),
+      new Vector3(-700, 0, -300),
+      new Vector3(-700, 0, 0),
+
+    ];
   }
 
   addMarsBase() {
     this.loader = new GLTFLoader();
     const ctx = this;
     this.loader.load('assets/mars_base/scene.gltf', function(gltf) {
-      console.log(gltf);
-      ctx.scene.add(gltf.scene);
+      ctx.newBox = new Box3().setFromPoints(ctx.vectors);
+      ctx.marsBase = gltf.scene;
+      ctx.marsBase.collider = ctx.newBox;
+      ctx.helperBox = new Box3Helper(ctx.newBox);
+      ctx.helperBox.visible = true;
+      ctx.scene.add(ctx.marsBase);
+      ctx.scene.add(ctx.helperBox);
     }, undefined, function(error) {
       console.error(error);
     });
