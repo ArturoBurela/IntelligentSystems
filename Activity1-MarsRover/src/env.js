@@ -23,6 +23,10 @@ import {
   GLTFLoader
 } from 'three/examples/jsm/loaders/GLTFLoader';
 
+import {
+  OBJLoader
+} from 'three/examples/jsm/loaders/OBJLoader';
+
 const BACKGROUND_COLOR = 0x000000;
 const AMBIENT_COLOR = 0x000000;
 const FOG_COLOR = 0x000000;
@@ -38,14 +42,21 @@ class MarsEnvironment {
     this.addSky();
     this.addMarsBase();
     this.createPlane();
+    this.rockModels = [];
+    this.rocks = [];
+    this.loadRockModels().then( function(res) {
+      //clone the number of desired rocks
+      return this.cloneRocks(res);
+    });
+
     this.marsBase = null;
     this.helperBox = null;
     this.newBox = null;
     this.vectors = [
-      new Vector3(-700, 200,0), 
-      new Vector3(700, 200,0), 
-      new Vector3(700, 200, -300), 
-      new Vector3(-700, 200, -300), 
+      new Vector3(-700, 200,0),
+      new Vector3(700, 200,0),
+      new Vector3(700, 200, -300),
+      new Vector3(-700, 200, -300),
       new Vector3(-700, 200, 0),
       new Vector3(700, 0, 0),
       new Vector3(700, 0, -300),
@@ -139,6 +150,66 @@ class MarsEnvironment {
     this.cube.rotation.x += 0.01;
     this.cube.rotation.y += 0.01;
   }
+
+  cloneRocks(no_of_rocks) {
+    const temp_env = this;
+    var x;
+    for(x = 0; x < no_of_rocks; x++) {
+      var model_no = Math.floor(Math.random() * 6);
+      console.log('rocas!');
+      var rock = temp_env.rockModels[model_no].clone();
+      rock.position.set( ((Math.floor(Math.random() * 100)+10) * 10), 40, ((Math.floor(Math.random() * 100)+10) * 10));
+      temp_env.rocks.push(rock);
+      temp_env.scene.add(rock);
+    }
+  }
+
+  loadRockModels() {
+
+    const temp_env = this;
+
+    return new Promise(function( resolve, reject ){
+
+      var texture = new TextureLoader().load('assets/Rocks/Texture/diffuseG6.jpg');
+
+      var i;
+      for (i = 1; i < 7; i++) {
+        var path = 'assets/Rocks/Rock';
+        const objLoader = new OBJLoader();
+        objLoader.load(
+            path.concat(i.toString(),'.obj'),
+            function(object)
+            {
+                object.traverse( function ( child )
+                {
+                    if ( child instanceof Mesh )
+                    {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                        child.material.map = texture;
+                    }
+                } );
+
+                object.scale.set(30,30,30);
+                temp_env.rockModels.push(object);
+                //rock.position.z = 600;
+                //rock.position.x = 0;
+                //rock.position.y = 40;
+                //temp_env.scene.add(object);
+            },
+            function ( xhr ) {
+                console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+            },
+            // called when loading has errors
+            function ( error ) {
+                console.log( 'An error happened' );
+            });
+      }
+      //clone the number of desired rocks
+      return 25;
+    });
+  }
+
 }
 
 export {
