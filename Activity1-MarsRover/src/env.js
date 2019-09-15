@@ -5,6 +5,7 @@ import {
   Box3,
   BoxHelper,
   Box3Helper,
+  DirectionalLight,
   MeshBasicMaterial,
   Mesh,
   Color,
@@ -15,6 +16,8 @@ import {
   BackSide,
   AmbientLight,
   MeshLambertMaterial,
+  MeshPhongMaterial,
+  ImageUtils,
   PlaneBufferGeometry,
   TextureLoader,
   Vector3
@@ -52,8 +55,10 @@ class MarsEnvironment {
     this.rockModels = [];
     this.rocks = [];
     this.rocksColliders = [];
-    //Number of rocks to spawn
-    this.loadRocks(75).then((res) => {
+    this.ufoModel = null;
+    this.ufos = [];
+    //Number of rocks and obstacles to spawn
+    this.loadEnv(75,5).then((res) => {
       console.log(res + ' rocks spawned');
     });
     this.marsBase = null;
@@ -71,11 +76,6 @@ class MarsEnvironment {
       new Vector3(-700, 0, 0),
 
     ];
-    this.ufoModel = null;
-    this.ufos = [];
-    this.loadObs(10).then((res) => {
-      console.log(res + ' obstacles spawned');
-    });
   }
 
   addMarsBase() {
@@ -91,46 +91,6 @@ class MarsEnvironment {
       ctx.scene.add(ctx.helperBox);
     }, undefined, function(error) {
       console.error(error);
-    });
-  }
-
-  loadObsModel() {
-    var loader = new FBXLoader();
-    loader.load( 'assets/ufo/source/B4_low.fbx', function ( object )
-    {
-        object.traverse( function ( child ) {
-            if ( child.isMesh ) {
-                child.castShadow = true;
-                child.receiveShadow = true;
-            }
-        } );
-        this.ufoModel = object;
-    } );
-  }
-
-  cloneObs(no_of_obs) {
-    const temp_env = this;
-    return new Promise(resolve => {
-      console.log('ufos!');
-
-      setTimeout(() => {
-        var x;
-        for(x = 0; x < no_of_obs; x++) {
-          var newUfo = cloneFbx(temp_env.ufoModel);
-          newUfo.position.set( ((Math.floor(Math.random() * 201)-100) * 20), 35, ((Math.floor(Math.random() * 201)-100) * 20));
-          newUfo.scale.set(3, 3, 3);
-
-          var ubox = new THREE.BoxHelper(newUfo, 0x00ff00);
-          ubox.position = newUfo.position;
-          ubox.visible = true;
-
-          var col = new THREE.Box3().setFromObject(newUfo);
-          scene.add(newUfo);
-          scene.add(ubox);
-          temp_env.ufos.push(col);
-        }
-        resolve(no_of_obs);
-      }, 10000);
     });
   }
 
@@ -231,7 +191,7 @@ class MarsEnvironment {
     });
   }
 
-  loadRockModels(x) {
+  loadRockModels() {
 
     const temp_env = this;
 
@@ -259,7 +219,7 @@ class MarsEnvironment {
 
                 object.scale.set(30,30,30);
                 temp_env.rockModels.push(object);
-                resolve(x);
+                resolve();
             },
             function ( xhr ) {
                 console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
@@ -273,15 +233,79 @@ class MarsEnvironment {
     });
   }
 
-  async loadRocks(x){
-    await this.loadRockModels();
-    await this.cloneRocks(x)
-    return x;
+  loadObsModel() {
+    const temp_env = this;
+
+    return new Promise(resolve => {
+
+      var text = new MeshPhongMaterial ({
+        normalMap: new TextureLoader().load('assets/ufo/ufo_normal.png'),
+        map: new TextureLoader().load('assets/ufo/ufo_diffuse.png'),
+        specularMap: new TextureLoader().load('assets/ufo/ufo_spec.png')
+      });
+
+      const objLoader = new OBJLoader();
+      objLoader.load(
+          'assets/ufo/Low_poly_UFO.obj',
+          function(object)
+          {
+              object.traverse( function ( child )
+              {
+                  if ( child instanceof Mesh )
+                  {
+                      child.castShadow = true;
+                      child.receiveShadow = true;
+                      child.material = text;
+                  }
+              } );
+
+              object.scale.set(6,6,6);
+              temp_env.ufoModel = object;
+
+              resolve();
+          },
+          function ( xhr ) {
+              console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          },
+          // called when loading has errors
+          function ( error ) {
+              console.log( 'An error happened' );
+          });
+
+    });
   }
 
-  async loadObs(x){
+  cloneObs(no_of_ufos) {
+    const temp_env = this;
+    return new Promise(resolve => {
+      console.log('ufos!');
+
+      setTimeout(() => {
+        var x;
+        for(x = 0; x < no_of_ufos; x++) {
+
+          var newUfo = temp_env.ufoModel.clone();
+          newUfo.position.set( ((Math.floor(Math.random() * 201)-100) * 20), 15, ((Math.floor(Math.random() * 201)-100) * 20));
+
+          var ubox = new Box3().setFromObject(newUfo);
+          var hubox = new BoxHelper(newUfo, 0x00ff00);
+          hubox.position.set(newUfo.position);
+          hubox.visible = true;
+
+          temp_env.scene.add(newUfo);
+          temp_env.scene.add(hubox);
+          temp_env.ufos.push(ubox);
+        }
+        resolve(no_of_ufos);
+      }, 2000);
+    });
+  }
+
+  async loadEnv(x, y){
+    await this.loadRockModels();
+    await this.cloneRocks(x);
     await this.loadObsModel();
-    await this.cloneObs(x)
+    await this.cloneObs(y);
     return x;
   }
 
