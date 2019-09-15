@@ -28,6 +28,12 @@ import {
   OBJLoader
 } from 'three/examples/jsm/loaders/OBJLoader';
 
+import {
+  FBXLoader
+} from 'three/examples/jsm/loaders/FBXLoader';
+
+import { cloneFbx } from '../utils/cloneFBX.js';
+
 const BACKGROUND_COLOR = 0x000000;
 const AMBIENT_COLOR = 0x000000;
 const FOG_COLOR = 0x000000;
@@ -50,7 +56,6 @@ class MarsEnvironment {
     this.loadRocks(75).then((res) => {
       console.log(res + ' rocks spawned');
     });
-
     this.marsBase = null;
     this.helperBox = null;
     this.newBox = null;
@@ -66,6 +71,11 @@ class MarsEnvironment {
       new Vector3(-700, 0, 0),
 
     ];
+    this.ufoModel = null;
+    this.ufos = [];
+    this.loadObs(10).then((res) => {
+      console.log(res + ' obstacles spawned');
+    });
   }
 
   addMarsBase() {
@@ -81,6 +91,46 @@ class MarsEnvironment {
       ctx.scene.add(ctx.helperBox);
     }, undefined, function(error) {
       console.error(error);
+    });
+  }
+
+  loadObsModel() {
+    var loader = new FBXLoader();
+    loader.load( 'assets/ufo/source/B4_low.fbx', function ( object )
+    {
+        object.traverse( function ( child ) {
+            if ( child.isMesh ) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+            }
+        } );
+        this.ufoModel = object;
+    } );
+  }
+
+  cloneObs(no_of_obs) {
+    const temp_env = this;
+    return new Promise(resolve => {
+      console.log('ufos!');
+
+      setTimeout(() => {
+        var x;
+        for(x = 0; x < no_of_obs; x++) {
+          var newUfo = cloneFbx(temp_env.ufoModel);
+          newUfo.position.set( ((Math.floor(Math.random() * 201)-100) * 20), 35, ((Math.floor(Math.random() * 201)-100) * 20));
+          newUfo.scale.set(3, 3, 3);
+
+          var ubox = new THREE.BoxHelper(newUfo, 0x00ff00);
+          ubox.position = newUfo.position;
+          ubox.visible = true;
+
+          var col = new THREE.Box3().setFromObject(newUfo);
+          scene.add(newUfo);
+          scene.add(ubox);
+          temp_env.ufos.push(col);
+        }
+        resolve(no_of_obs);
+      }, 10000);
     });
   }
 
@@ -226,6 +276,12 @@ class MarsEnvironment {
   async loadRocks(x){
     await this.loadRockModels();
     await this.cloneRocks(x)
+    return x;
+  }
+
+  async loadObs(x){
+    await this.loadObsModel();
+    await this.cloneObs(x)
     return x;
   }
 
