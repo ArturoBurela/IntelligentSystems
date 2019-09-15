@@ -44,9 +44,9 @@ class MarsEnvironment {
     this.createPlane();
     this.rockModels = [];
     this.rocks = [];
-    this.loadRockModels().then( function(res) {
-      //clone the number of desired rocks
-      return this.cloneRocks(res);
+    //Number of rocks to spawn
+    this.loadRocks(75).then((res) => {
+      console.log(res);
     });
 
     this.marsBase = null;
@@ -152,23 +152,29 @@ class MarsEnvironment {
   }
 
   cloneRocks(no_of_rocks) {
-    const temp_env = this;
-    var x;
-    for(x = 0; x < no_of_rocks; x++) {
-      var model_no = Math.floor(Math.random() * 6);
+    return new Promise(resolve => {
       console.log('rocas!');
-      var rock = temp_env.rockModels[model_no].clone();
-      rock.position.set( ((Math.floor(Math.random() * 100)+10) * 10), 40, ((Math.floor(Math.random() * 100)+10) * 10));
-      temp_env.rocks.push(rock);
-      temp_env.scene.add(rock);
-    }
+      const temp_env = this;
+      setTimeout(() => {
+        var x;
+        for(x = 0; x < no_of_rocks; x++) {
+          var model_no = Math.floor(Math.random() * 6);
+          console.log('rocas!');
+          var rock = temp_env.rockModels[model_no].clone();
+          rock.position.set( ((Math.floor(Math.random() * 201)-100) * 18), 40, ((Math.floor(Math.random() * 201)-100) * 18));
+          temp_env.rocks.push(rock);
+          temp_env.scene.add(rock);
+        }
+        resolve(no_of_rocks);
+      }, 2000);
+    });
   }
 
-  loadRockModels() {
+  loadRockModels(x) {
 
     const temp_env = this;
 
-    return new Promise(function( resolve, reject ){
+    return new Promise(resolve => {
 
       var texture = new TextureLoader().load('assets/Rocks/Texture/diffuseG6.jpg');
 
@@ -192,10 +198,8 @@ class MarsEnvironment {
 
                 object.scale.set(30,30,30);
                 temp_env.rockModels.push(object);
-                //rock.position.z = 600;
-                //rock.position.x = 0;
-                //rock.position.y = 40;
-                //temp_env.scene.add(object);
+                console.log(object.children);
+                resolve(x);
             },
             function ( xhr ) {
                 console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
@@ -205,9 +209,14 @@ class MarsEnvironment {
                 console.log( 'An error happened' );
             });
       }
-      //clone the number of desired rocks
-      return 25;
+
     });
+  }
+
+  async loadRocks(x){
+    await this.loadRockModels();
+    await this.cloneRocks(x)
+    return x;
   }
 
 }
