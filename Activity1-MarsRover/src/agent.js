@@ -159,7 +159,13 @@ class RoverAgent {
   }
 
   carryRock() {
+  
+  }
 
+  updateRock(col){
+    if(this.modelAgent.collider.intersectsBox(col)){
+      //console.log("Rock Found!!!");
+    }
   }
 
   animate() {
