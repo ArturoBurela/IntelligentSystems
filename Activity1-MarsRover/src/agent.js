@@ -101,7 +101,8 @@ class RoverAgent {
 
   moveAgent() {
     if (this.agentGroup.rotation.y === 0) {
-      this.agentGroup.rotation.y = 0
+      this.agentGroup.rotation.y = 0;
+      this.modelAgent.rotation.y = 0;
       if (this.turnUp) {
         this.agentGroup.translateX(this.step);
         this.moverPuntos(3);
@@ -109,6 +110,7 @@ class RoverAgent {
       this.checkObstacles();
     } else if (this.agentGroup.rotation.y === Math.PI / 2) {
       this.agentGroup.rotation.y = Math.PI / 2;
+      // this.modelAgent.rotation.y = Math.PI / 2;
       if (this.turnLeft) {
         this.agentGroup.translateX(this.step);
         this.moverPuntos(0);
@@ -116,6 +118,7 @@ class RoverAgent {
       this.checkObstacles();
     } else if (this.agentGroup.rotation.y === -Math.PI / 2) {
       this.agentGroup.rotation.y = -Math.PI / 2;
+      // this.modelAgent.rotation.y = -Math.PI / 2;
       if (this.turnRight) {
         this.agentGroup.translateX(this.step);
         this.moverPuntos(1);
@@ -123,6 +126,7 @@ class RoverAgent {
       this.checkObstacles();
     } else if (this.agentGroup.rotation.y === -Math.PI){
       this.agentGroup.rotation.y = - Math.PI;
+      this.modelAgent.rotation.y = - Math.PI;
       if (this.turnDown) {
         this.agentGroup.translateX(this.step);
         this.moverPuntos(2);
@@ -139,12 +143,16 @@ class RoverAgent {
     const ctx = this;
     if (randomNum >= 0 && randomNum < 0.25) {
       ctx.agentGroup.rotation.y = 0;
+      console.log("arriba");
     } else if (randomNum >= 0.25 && randomNum < 0.5) {
       ctx.agentGroup.rotation.y = Math.PI / 2;
+      console.log("izquierda");
     } else if (randomNum >= 0.5 && randomNum < 0.75) {
       ctx.agentGroup.rotation.y = -Math.PI;
+      console.log("abajo");
     } else {
       ctx.agentGroup.rotation.y = -Math.PI/2;
+      console.log("derecha");
     }
   }
 
@@ -152,10 +160,6 @@ class RoverAgent {
     if(this.modelAgent.collider.intersectsBox(collider)){
       console.log("lol");
     }
-  }
-
-  updateRock() {
-
   }
 
   carryRock() {
