@@ -2,7 +2,7 @@ import {
   GLTFLoader
 } from 'three/examples/jsm/loaders/GLTFLoader';
 
-import { Box3, SphereGeometry, Mesh, Object3D, MeshBasicMaterial } from "three";
+import { Box3, SphereGeometry, Mesh, Object3D, MeshBasicMaterial, Vector3 } from "three";
 
 class RoverAgent {
   constructor(scene) {
@@ -24,6 +24,8 @@ class RoverAgent {
       dotU: new MeshBasicMaterial({ color: 0x0000ff }), dotD: new MeshBasicMaterial({ color: 0x00ff00 }),
       dotL: new MeshBasicMaterial({ color: 0xff0000 }), dotR: new MeshBasicMaterial({ color: 0xffffff })
     };
+    this.hasRock = false;
+    this.basePosition = new Vector3(0,0,0);
     this.addAgent();
   }
 
@@ -98,28 +100,28 @@ class RoverAgent {
   }
 
   moveAgent() {
-    if (this.modelAgent.rotation.y === 0) {
+    if (this.agentGroup.rotation.y === 0) {
       this.agentGroup.rotation.y = 0
       if (this.turnUp) {
         this.agentGroup.translateX(this.step);
         this.moverPuntos(3);
       }
       this.checkObstacles();
-    } else if (this.modelAgent.rotation.y === Math.PI / 2) {
+    } else if (this.agentGroup.rotation.y === Math.PI / 2) {
       this.agentGroup.rotation.y = Math.PI / 2;
       if (this.turnLeft) {
         this.agentGroup.translateX(this.step);
         this.moverPuntos(0);
       }
       this.checkObstacles();
-    } else if (this.modelAgent.rotation.y === -Math.PI / 2) {
+    } else if (this.agentGroup.rotation.y === -Math.PI / 2) {
       this.agentGroup.rotation.y = -Math.PI / 2;
       if (this.turnRight) {
         this.agentGroup.translateX(this.step);
         this.moverPuntos(1);
       }
       this.checkObstacles();
-    } else if (this.modelAgent.rotation.y === -Math.PI){
+    } else if (this.agentGroup.rotation.y === -Math.PI){
       this.agentGroup.rotation.y = - Math.PI;
       if (this.turnDown) {
         this.agentGroup.translateX(this.step);
@@ -136,13 +138,13 @@ class RoverAgent {
   rotateAgent(randomNum) {
     const ctx = this;
     if (randomNum >= 0 && randomNum < 0.25) {
-      ctx.modelAgent.rotation.y = 0;
+      ctx.agentGroup.rotation.y = 0;
     } else if (randomNum >= 0.25 && randomNum < 0.5) {
-      ctx.modelAgent.rotation.y = Math.PI / 2;
+      ctx.agentGroup.rotation.y = Math.PI / 2;
     } else if (randomNum >= 0.5 && randomNum < 0.75) {
-      ctx.modelAgent.rotation.y = -Math.PI;
+      ctx.agentGroup.rotation.y = -Math.PI;
     } else {
-      ctx.modelAgent.rotation.y = -Math.PI/2;
+      ctx.agentGroup.rotation.y = -Math.PI/2;
     }
   }
 
@@ -150,6 +152,14 @@ class RoverAgent {
     if(this.modelAgent.collider.intersectsBox(collider)){
       console.log("lol");
     }
+  }
+
+  updateRock() {
+
+  }
+
+  carryRock() {
+
   }
 
   animate() {
