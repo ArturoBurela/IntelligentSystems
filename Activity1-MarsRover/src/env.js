@@ -31,11 +31,6 @@ import {
   OBJLoader
 } from 'three/examples/jsm/loaders/OBJLoader';
 
-import {
-  FBXLoader
-} from 'three/examples/jsm/loaders/FBXLoader';
-
-import { cloneFbx } from '../utils/cloneFBX.js';
 
 const BACKGROUND_COLOR = 0x000000;
 const AMBIENT_COLOR = 0x000000;
@@ -58,7 +53,7 @@ class MarsEnvironment {
     this.ufoModel = null;
     this.ufos = [];
     //Number of rocks and obstacles to spawn
-    this.loadEnv(75,5).then((res) => {
+    this.loadEnv(75,7).then((res) => {
       console.log(res + ' rocks spawned');
     });
     this.marsBase = null;
@@ -174,7 +169,18 @@ class MarsEnvironment {
           var model_no = Math.floor(Math.random() * 6);
 
           var rock = temp_env.rockModels[model_no].clone();
-          rock.position.set( ((Math.floor(Math.random() * 201)-100) * 20), 35, ((Math.floor(Math.random() * 201)-100) * 20));
+          var zside = Math.random() < 0.5 ? -1 : 1;
+          var xside = Math.random() < 0.5 ? -1 : 1;
+          //negative
+          if (zside < 0){
+            rock.position.set( (Math.floor(Math.random() * 1151) * xside), 30, ((Math.floor(Math.random() * 1101)+500) * zside));
+          }
+          //Positive
+          else {
+            rock.position.set( (Math.floor(Math.random() * 1151) * xside), 30, (Math.floor(Math.random() * 751)+250));
+          }
+
+          //rock.position.set( ((Math.floor(Math.random() * 201)-100) * 20), 30, ((Math.floor(Math.random() * 201)-100) * 20));
 
           var rbox = new Box3().setFromObject(rock);
           var hrbox = new BoxHelper(rock, 0x00ff00);
@@ -259,7 +265,7 @@ class MarsEnvironment {
                   }
               } );
 
-              object.scale.set(6,6,6);
+              object.scale.set(4,4,4);
               temp_env.ufoModel = object;
 
               resolve();
@@ -285,8 +291,16 @@ class MarsEnvironment {
         for(x = 0; x < no_of_ufos; x++) {
 
           var newUfo = temp_env.ufoModel.clone();
-          newUfo.position.set( ((Math.floor(Math.random() * 201)-100) * 20), 15, ((Math.floor(Math.random() * 201)-100) * 20));
-
+          var zside = Math.random() < 0.5 ? -1 : 1;
+          var xside = Math.random() < 0.5 ? -1 : 1;
+          //negative
+          if (zside < 0){
+            newUfo.position.set( (Math.floor(Math.random() * 1151) * xside), -35, ((Math.floor(Math.random() * 1101)+500) * zside));
+          }
+          //Positive
+          else {
+            newUfo.position.set( (Math.floor(Math.random() * 1151) * xside), -35, (Math.floor(Math.random() * 751)+250));
+          }
           var ubox = new Box3().setFromObject(newUfo);
           var hubox = new BoxHelper(newUfo, 0x00ff00);
           hubox.position.set(newUfo.position);
