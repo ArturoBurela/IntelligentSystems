@@ -60,6 +60,7 @@ const agent = new RoverAgent(scene);
 let random = Math.random();
 let rotateRand = Math.random();
 let rotate = true;
+var x;
 // animate the scene
 const animate = function() {
   requestAnimationFrame(animate);
@@ -70,6 +71,10 @@ const animate = function() {
   if (agent.modelAgent && env.marsBase) {
     agent.moveAgent(random);
     agent.updateBase(env.marsBase.collider);
+    for(x = 0; x < env.rocksColliders.length; x++)
+    {
+      agent.updateRock(env.rocksColliders[x]);
+    }
     if(Math.floor(clock.getElapsedTime()) % 10 === 0 && clock.getElapsedTime() > 1 && rotate){
       rotate = false;
       agent.rotateAgent(rotateRand);

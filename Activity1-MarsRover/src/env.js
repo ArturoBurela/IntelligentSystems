@@ -3,6 +3,7 @@
 import {
   BoxGeometry,
   Box3,
+  BoxHelper,
   Box3Helper,
   MeshBasicMaterial,
   Mesh,
@@ -44,9 +45,10 @@ class MarsEnvironment {
     this.createPlane();
     this.rockModels = [];
     this.rocks = [];
+    this.rocksColliders = [];
     //Number of rocks to spawn
     this.loadRocks(75).then((res) => {
-      console.log(res);
+      console.log(res + ' rocks spawned');
     });
 
     this.marsBase = null;
@@ -152,18 +154,27 @@ class MarsEnvironment {
   }
 
   cloneRocks(no_of_rocks) {
+    const temp_env = this;
     return new Promise(resolve => {
       console.log('rocas!');
-      const temp_env = this;
+
       setTimeout(() => {
         var x;
         for(x = 0; x < no_of_rocks; x++) {
           var model_no = Math.floor(Math.random() * 6);
-          console.log('rocas!');
+
           var rock = temp_env.rockModels[model_no].clone();
-          rock.position.set( ((Math.floor(Math.random() * 201)-100) * 18), 40, ((Math.floor(Math.random() * 201)-100) * 18));
+          rock.position.set( ((Math.floor(Math.random() * 201)-100) * 20), 35, ((Math.floor(Math.random() * 201)-100) * 20));
+
+          var rbox = new Box3().setFromObject(rock);
+          var hrbox = new BoxHelper(rock, 0x00ff00);
+          hrbox.position.set(rock.position);
+          hrbox.visible = true;
+
           temp_env.rocks.push(rock);
           temp_env.scene.add(rock);
+          temp_env.scene.add(hrbox);
+          temp_env.rocksColliders.push(rbox);
         }
         resolve(no_of_rocks);
       }, 2000);
@@ -198,7 +209,6 @@ class MarsEnvironment {
 
                 object.scale.set(30,30,30);
                 temp_env.rockModels.push(object);
-                console.log(object.children);
                 resolve(x);
             },
             function ( xhr ) {
