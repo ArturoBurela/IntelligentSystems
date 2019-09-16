@@ -3,19 +3,22 @@ import {
 } from 'three/examples/jsm/loaders/GLTFLoader';
 
 import { Box3 } from "three";
+import { Tween } from "@tweenjs/tween.js";
 
 class RoverAgent {
-  constructor(scene) {
+  constructor(scene, multiagent, carrier) {
     this.scene = scene;
     // Instantiate a loader GLTF is prefered
     this.loader = new GLTFLoader();
     this.modelAgent;
+    this.multiagent = multiagent;
     this.addAgent();
     this.rockStack = 0;
     this.rockLimit = 6;
     this.rocksCollected = 0;
     this.full = false;
-    this.velocity = 2;
+    this.velocity = 7;
+    this.isCarrier = carrier;
   }
 
   addAgent() {
@@ -81,22 +84,48 @@ class RoverAgent {
 
   //Cuando se colisiona con una roca
   updateRock(col) {
-    if (this.modelAgent.collider.intersectsBox(col)) {
-      if (this.rockStack == this.rockLimit) {
+    if (!this.multiagent) {
+      if (this.modelAgent.collider.intersectsBox(col)) {
+        if (this.rockStack === this.rockLimit) {
+          return false;
+        }
+        else {
+          this.rockStack += 1;
+          console.log('Rock stack has ' + this.rockStack.toString() + ' rocks');
+          if (this.rockStack == this.rockLimit) {
+            console.log('Rock stack limit has been already reached, agent must go to the station!');
+            this.full = true;
+          }
+          return true;
+        }
+        //console.log("Rock Found!!!");
+      }
+      return false;
+    }
+    else {
+      if(this.multiagent && !this.isCarrier){
+        this.sendMessage(this.modelAgent.position);
+      } 
+      else if (this.multiagent && this.isCarrier){
+        if (this.modelAgent.collider.intersectsBox(col)) {
+          if (this.rockStack === this.rockLimit) {
+            return false;
+          }
+          else {
+            this.rockStack += 1;
+            console.log('Rock stack has ' + this.rockStack.toString() + ' rocks');
+            if (this.rockStack == this.rockLimit) {
+              console.log('Rock stack limit has been already reached, agent must go to the station!');
+              this.full = true;
+            }
+            return true;
+          }
+          //console.log("Rock Found!!!");
+        }
         return false;
       }
-      else {
-        this.rockStack += 1;
-        console.log('Rock stack has ' + this.rockStack.toString() + ' rocks');
-        if (this.rockStack == this.rockLimit) {
-          console.log('Rock stack limit has been already reached, agent must go to the station!');
-          this.full = true;
-        }
-        return true;
-      }
-      //console.log("Rock Found!!!");
     }
-    return false;
+    
   }
 
   //Cuando se colisiona con un obstáculo
@@ -150,6 +179,19 @@ class RoverAgent {
       ctx.modelAgent.position.x >= 1150 || ctx.modelAgent.position.x <= -1150) {
       console.log('Limit of map has been reached, go other way');
       ctx.avoidObstacle(Math.round(Math.random()));
+    }
+  }
+
+  sendMessage(position) {
+    console.log("Rock at position", position);
+    return position;
+  }
+
+  goForRock(position) {
+    const ctx = this;
+    if(ctx.isCarrier){
+      new Tween().to(position, 5000)
+
     }
   }
 

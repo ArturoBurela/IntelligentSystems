@@ -24,6 +24,7 @@ const context = WEBGL.isWebGL2Available() ? canvas.getContext('webgl2', { alpha:
 // Create basic ThreeJS objects: scene, camera, controls and renderer
 const scene = new Scene();
 var clock = new Clock();
+var multiagente = true;
 const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
 const renderer = new WebGLRenderer({ canvas: canvas, context: context });
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -35,6 +36,7 @@ document.body.appendChild(renderer.domElement);
 // camera.position.z = 500;
 // camera.position.y = 500;
 camera.position.set(9.6, 1242.3, -158.76);
+camera.rotation.y = (3 * Math.PI) / 2;
 
 // renderer
 renderer.setPixelRatio(window.devicePixelRatio);
@@ -54,9 +56,10 @@ controls.maxDistance = 3500;
 // window.addEventListener( 'resize', onWindowResize, false );
 
 // Instantiate Environment
-const env = new MarsEnvironment(1, 1, scene);
+const env = new MarsEnvironment(1, 1, multiagente,scene); // tercer argumento es si es multiagente (exploradores y cargadores)
 // Instantiate Agent?
-const agent = new RoverAgent(scene);
+const agent = new RoverAgent(scene, env.multiagent,false);
+const carrier = new RoverAgent(scene, env.multiagent,true);
 let random = Math.random();
 let rotateRand = Math.random();
 let rotate = true;
@@ -67,8 +70,9 @@ const animate = function () {
   // Call to env animate
   env.animate();
   agent.animate();
+  carrier.animate();
   renderer.render(scene, camera);
-  if (agent.modelAgent && env.marsBase) {
+  if (agent.modelAgent && carrier.modelAgent && env.marsBase) {
     agent.moveAgent(random);
     agent.updateLimits();
     if (agent.updateBase(env.marsBase.collider)) {

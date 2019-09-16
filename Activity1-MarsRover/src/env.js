@@ -38,10 +38,11 @@ const FOG_COLOR = 0x000000;
 
 
 class MarsEnvironment {
-  constructor(numRocks, numObstacles, scene) {
+  constructor(numRocks, numObstacles, multiagent,scene) {
     this.numRocks = numRocks;
     this.numObstacles = numObstacles;
     this.scene = scene;
+    this.multiagent = multiagent;
     this.addLights();
     // this.addGround();
     this.addSky();
@@ -52,6 +53,7 @@ class MarsEnvironment {
     this.rocksColliders = [];
     this.ufoModel = null;
     this.ufos = [];
+    this.messages = [];
     //Number of rocks and obstacles to spawn
     this.loadEnv(150,7).then((res) => {
       console.log(res + ' rocks spawned');
