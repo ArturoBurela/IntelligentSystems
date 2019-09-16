@@ -350,7 +350,8 @@ class MarsEnvironment {
   }
 
   updateMessages() {
-    console.log([...new Set(this.messages)]);
+    let mensajes = [...new Set(this.messages)]; // Posiciones únicas
+    return mensajes;
   }
 
   async loadEnv(x, y){

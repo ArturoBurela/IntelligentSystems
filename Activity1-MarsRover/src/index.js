@@ -79,11 +79,18 @@ const animate = function () {
   if(scene.agentsLoaded == no_of_agents) {
     // Call to env animate
     //env.animate();
-    env.updateMessages();
+    let mensajes = env.updateMessages();
     //env.animate();
 
     for(i = 0; i < no_of_agents; i++){
       agents[i].animate();
+      if (agents[i].isCarrier && mensajes.length > 0) { // Mensajes en el ambiente para saber posiciones
+        if (agents[i].positions.length < 1){ // una roca por agente
+          agents[i].positions.push(mensajes[0]); // agregar mensaje a agente
+          mensajes.shift(); // eliminar de mensajes
+          agents[i].positions = [...new Set(agents[i].positions)]; // que sea único
+        }
+      }
     }
 
     if (env.marsBase) {
@@ -126,6 +133,10 @@ const animate = function () {
             scene.remove(scene.getObjectByName(env.rocksColliders[x].name));
             env.rocksColliders.splice(x,1);
             env.rocks.splice(x,1);
+            if (agents[i].positions[0] === env.rocksColliders[x].position) {
+              agents[i].positions.shift();
+            }
+
           }
         }
         for(x = 0; x < env.ufos.length; x++)
@@ -137,6 +148,12 @@ const animate = function () {
         {
           if(x != i){
             agents[i].updateOtherAgent(agents[x].modelAgent.collider);
+          }
+        }
+
+        for (x = 0; x < agents.length; x++) {
+          if (agents[i].isCarrier && agents[i].positions.length > 0) {
+            agents[i].goForRock(agents[i].positions[0]);
           }
         }
 

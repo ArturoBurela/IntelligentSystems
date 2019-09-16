@@ -2,8 +2,10 @@ import {
   GLTFLoader
 } from 'three/examples/jsm/loaders/GLTFLoader';
 
+import { Easing, Tween } from 'es6-tween';
 import { Box3 } from "three";
-import { Tween } from "@tweenjs/tween.js";
+// const { add, remove, isRunning, autoPlay } = TWEEN;
+// const { autoPlay, Tween, Easing } = TWEEN;
 
 class RoverAgent {
   constructor(scene, x, y, z, carrier, multiagent, env) {
@@ -22,6 +24,8 @@ class RoverAgent {
     this.velocity = 7;
     this.isCarrier = carrier;
     this.rotate = true;
+    this.positions = [];
+    this.move = null;
   }
 
   addAgent(x, y, z, scene) {
@@ -36,6 +40,7 @@ class RoverAgent {
       let newBox = new Box3().setFromObject(gltf.scene);
       ctx.modelAgent = gltf.scene;
       ctx.modelAgent.collider = newBox;
+      ctx.move = new Tween(ctx.modelAgent.position);
       ctx.scene.add(ctx.modelAgent);
       //console.log('agente creado');
       scene.agentsLoaded += 1;
@@ -47,7 +52,7 @@ class RoverAgent {
 
   moveAgent() {
     const ctx = this;
-    if(ctx.stop == true){
+    if (ctx.stop == true) {
       return;
     }
     //console.log('rotation of agent is: ' + ctx.modelAgent.rotation.y.toString());
@@ -103,10 +108,9 @@ class RoverAgent {
         }
         else {
           this.rockStack += 1;
-          this.scene.rocksGathered += 1;
-          //console.log('Rock stack has ' + this.rockStack.toString() + ' rocks');
+          // console.log('Rock stack has ' + this.rockStack.toString() + ' rocks');
           if (this.rockStack == this.rockLimit) {
-            //console.log('Rock stack limit has been already reached, agent must go to the station!');
+          // console.log('Rock stack limit has been already reached, agent must go to the station!');
             this.full = true;
           }
           return true;
@@ -125,8 +129,8 @@ class RoverAgent {
             this.sendMessage(col.position);
             return false;
           }
-        }
-      }
+        } 
+      } 
       else if (this.multiagent && this.isCarrier){
         if (this.modelAgent.collider.intersectsBox(col)) {
           if (this.rockStack === this.rockLimit) {
@@ -145,7 +149,7 @@ class RoverAgent {
         return false;
       }
     }
-
+    
   }
 
   //Cuando se colisiona con un obstáculo
@@ -211,19 +215,23 @@ class RoverAgent {
   }
 
   sendMessage(position) {
-    this.env.messages.push(position);
+    this.env.messages.push(position); // Agregar mensajes al ambiente
   }
 
   goForRock(position) {
     const ctx = this;
     if(ctx.isCarrier){
-      new Tween().to(position, 5000)
+      ctx.move = new Tween(ctx.modelAgent.position);
+      ctx.move.to(position, 5000).start(); // Moverse a la posición de la roca
+    } else {
+      return;
     }
   }
 
   animate() {
     if (this.modelAgent && this.modelAgent.collider) {
       this.modelAgent.collider.setFromObject(this.modelAgent);
+      this.move.update();
     }
   }
 }
