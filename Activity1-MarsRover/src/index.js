@@ -70,6 +70,7 @@ const animate = function() {
   renderer.render(scene, camera);
   if (agent.modelAgent && env.marsBase) {
     agent.moveAgent(random);
+    agent.updateLimits();
     agent.updateBase(env.marsBase.collider);
     for(x = 0; x < env.rocksColliders.length; x++)
     {

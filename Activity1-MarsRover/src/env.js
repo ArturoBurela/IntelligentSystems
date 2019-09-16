@@ -69,7 +69,6 @@ class MarsEnvironment {
       new Vector3(700, 0, -300),
       new Vector3(-700, 0, -300),
       new Vector3(-700, 0, 0),
-
     ];
   }
 

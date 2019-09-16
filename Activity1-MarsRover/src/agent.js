@@ -93,25 +93,38 @@ class RoverAgent {
 
   //Cuando se colisiona con un obstáculo
   updateObstacle(col){
-    const ctx = this;
     if(this.modelAgent.collider.intersectsBox(col)){
       console.log("Obstacle Found!!!");
       var selection = Math.round(Math.random());
-      if (ctx.modelAgent.rotation.y === 0 || ctx.modelAgent.rotation.y === Math.PI) {
-        if (selection === 0){
-          ctx.modelAgent.rotation.y = Math.PI / 2;
-        }
-        else{
-          ctx.modelAgent.rotation.y = (3*Math.PI) / 2;
-        }
-      } else if (ctx.modelAgent.rotation.y === (Math.PI / 2) || ctx.modelAgent.rotation.y === ((3*Math.PI) / 2)) {
-        if (selection === 0){
-          ctx.modelAgent.rotation.y = 0;
-        }
-        else{
-          ctx.modelAgent.rotation.y = Math.PI;
-        }
+      this.avoidObstacle(selection);
+    }
+  }
+
+  avoidObstacle(selection){
+    const ctx = this;
+    if (ctx.modelAgent.rotation.y === 0 || ctx.modelAgent.rotation.y === Math.PI) {
+      if (selection === 0){
+        ctx.modelAgent.rotation.y = Math.PI / 2;
       }
+      else{
+        ctx.modelAgent.rotation.y = (3*Math.PI) / 2;
+      }
+    } else if (ctx.modelAgent.rotation.y === (Math.PI / 2) || ctx.modelAgent.rotation.y === ((3*Math.PI) / 2)) {
+      if (selection === 0){
+        ctx.modelAgent.rotation.y = 0;
+      }
+      else{
+        ctx.modelAgent.rotation.y = Math.PI;
+      }
+    }
+  }
+
+  updateLimits(){
+    const ctx = this;
+    if(ctx.modelAgent.position.z >= 1000 || ctx.modelAgent.position.z <= -1600 ||
+       ctx.modelAgent.position.x >= 1150 || ctx.modelAgent.position.x <= -1150){
+         console.log('Limit of map has been reached, go other way');
+         ctx.avoidObstacle(Math.round(Math.random()));
     }
   }
 
