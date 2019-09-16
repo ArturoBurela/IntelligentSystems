@@ -19,7 +19,8 @@ import {
 } from './agent.js';
 
 // Get Canvas
-const canvas = document.createElement( 'canvas' );
+//const canvas = document.createElement( 'canvas' );
+const canvas = document.getElementById("canvas");
 // Try to use WEBGL2, fallback to default context
 const context = WEBGL.isWebGL2Available() ? canvas.getContext( 'webgl2', { alpha: false } ) : canvas.getContext();
 // Create basic ThreeJS objects: scene, camera, controls and renderer
@@ -31,7 +32,7 @@ const renderer = new WebGLRenderer({ canvas: canvas, context: context });
 const controls = new OrbitControls( camera, renderer.domElement );
 // Bind renderer to html
 renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+//document.body.appendChild(renderer.domElement);
 
 // Set camera position
 // camera.position.z = 500;
