@@ -73,7 +73,13 @@ const animate = function() {
     agent.updateBase(env.marsBase.collider);
     for(x = 0; x < env.rocksColliders.length; x++)
     {
-      agent.updateRock(env.rocksColliders[x]);
+      if(agent.updateRock(env.rocksColliders[x])) {
+        //Remover el collider y el mesh de la roca en la variable env
+        console.log('The agent got a rock!');
+        scene.remove(scene.getObjectByName(env.rocksColliders[x].name));
+        env.rocksColliders.splice(x,1);
+        env.rocks.splice(x,1);
+      }
     }
     for(x = 0; x < env.ufos.length; x++)
     {
