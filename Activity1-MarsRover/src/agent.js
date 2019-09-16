@@ -5,36 +5,42 @@ import {
 import { Box3 } from "three";
 
 class RoverAgent {
-  constructor(scene) {
+  constructor(scene, x, y, z) {
     this.scene = scene;
     // Instantiate a loader GLTF is prefered
     this.loader = new GLTFLoader();
     this.modelAgent;
-    this.addAgent();
+    this.addAgent(x, y, z, scene);
     this.rockStack = 0;
     this.rockLimit = 6;
     this.rocksCollected = 0;
     this.full = false;
     this.velocity = 2;
+    this.rotate = true;
   }
 
-  addAgent() {
+  addAgent(x, y, z, scene) {
     const ctx = this;
     this.loader.load('assets/rover.glb', function (gltf) {
-      gltf.scene.position.z = -250;
-      gltf.scene.position.y = 25;
+      gltf.scene.position.z = z;
+      gltf.scene.position.y = y;
+      gltf.scene.position.x = x;
       gltf.scene.scale.set(50,50,50);
       gltf.scene.rotation.set(0,0,0);
+      //console.log(gltf.scene);
       let newBox = new Box3().setFromObject(gltf.scene);
       ctx.modelAgent = gltf.scene;
       ctx.modelAgent.collider = newBox;
       ctx.scene.add(ctx.modelAgent);
+      //console.log('agente creado');
+      scene.agentsLoaded += 1;
+      //console.log('numero de agentes cargados: ' + scene.agentsLoaded.toString());
     }, undefined, function (error) {
       console.error(error);
     });
   }
 
-  moveAgent(randomNum) {
+  moveAgent() {
     const ctx = this;
     //console.log('rotation of agent is: ' + ctx.modelAgent.rotation.y.toString());
     if (ctx.modelAgent.rotation.y === 0) {
@@ -52,7 +58,8 @@ class RoverAgent {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  rotateAgent(randomNum) {
+  rotateAgent() {
+    let randomNum = Math.random();
     const ctx = this;
     if (randomNum >= 0 && randomNum < 0.25) {
       ctx.modelAgent.rotation.y = 0;
