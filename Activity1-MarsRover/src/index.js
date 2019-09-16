@@ -71,7 +71,11 @@ const animate = function() {
   if (agent.modelAgent && env.marsBase) {
     agent.moveAgent(random);
     agent.updateLimits();
-    agent.updateBase(env.marsBase.collider);
+    if(agent.updateBase(env.marsBase.collider)){
+      env.totalRocks += agent.rockStack;
+      agent.rockStack = 0;
+      agent.full = false;
+    }
     for(x = 0; x < env.rocksColliders.length; x++)
     {
       if(agent.updateRock(env.rocksColliders[x])) {
@@ -87,7 +91,22 @@ const animate = function() {
       agent.updateObstacle(env.ufos[x]);
     }
 
-    if(Math.floor(clock.getElapsedTime()) % 10 === 0 && clock.getElapsedTime() > 1 && rotate){
+    if(agent.full == true && Math.floor(clock.getElapsedTime()) % 5 === 0){
+      if(agent.modelAgent.position.z > 250){
+        agent.modelAgent.rotation.y = Math.PI;
+      }
+      else if(agent.modelAgent.position.z < -300){
+        agent.modelAgent.rotation.y = 0;
+      }
+      else if(agent.modelAgent.position.x > 850){
+        agent.modelAgent.rotation.y = ((3*Math.PI) / 2);
+      }
+      else if(agent.modelAgent.position.x < -850){
+        agent.modelAgent.rotation.y = Math.PI / 2;
+      }
+    }
+
+    if(Math.floor(clock.getElapsedTime()) % 10 === 0 && clock.getElapsedTime() > 1 && rotate && agent.full == false){
       rotate = false;
       agent.rotateAgent(rotateRand);
       rotateRand = Math.random();

@@ -53,7 +53,7 @@ class MarsEnvironment {
     this.ufoModel = null;
     this.ufos = [];
     //Number of rocks and obstacles to spawn
-    this.loadEnv(75,7).then((res) => {
+    this.loadEnv(150,7).then((res) => {
       console.log(res + ' rocks spawned');
     });
     this.marsBase = null;
@@ -70,6 +70,7 @@ class MarsEnvironment {
       new Vector3(-700, 0, -300),
       new Vector3(-700, 0, 0),
     ];
+    this.totalRocks = 0;
   }
 
   addMarsBase() {
@@ -287,7 +288,7 @@ class MarsEnvironment {
   cloneObs(no_of_ufos) {
     const temp_env = this;
     return new Promise(resolve => {
-      console.log('ufos!');
+      //console.log('ufos!');
 
       setTimeout(() => {
         var x;
@@ -298,11 +299,11 @@ class MarsEnvironment {
           var xside = Math.random() < 0.5 ? -1 : 1;
           //negative
           if (zside < 0){
-            newUfo.position.set( (Math.floor(Math.random() * 1151) * xside), -35, ((Math.floor(Math.random() * 1101)+500) * zside));
+            newUfo.position.set( (Math.floor(Math.random() * 951) * xside), -35, ((Math.floor(Math.random() * 851)+500) * zside));
           }
           //Positive
           else {
-            newUfo.position.set( (Math.floor(Math.random() * 1151) * xside), -35, (Math.floor(Math.random() * 751)+250));
+            newUfo.position.set( (Math.floor(Math.random() * 951) * xside), -35, (Math.floor(Math.random() * 501)+250));
           }
           var ubox = new Box3().setFromObject(newUfo);
           var hubox = new BoxHelper(newUfo, 0x00ff00);

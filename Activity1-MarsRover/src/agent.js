@@ -14,6 +14,8 @@ class RoverAgent {
     this.rockStack = 0;
     this.rockLimit = 6;
     this.rocksCollected = 0;
+    this.full = false;
+    this.velocity = 2;
   }
 
   addAgent() {
@@ -36,13 +38,13 @@ class RoverAgent {
     const ctx = this;
     //console.log('rotation of agent is: ' + ctx.modelAgent.rotation.y.toString());
     if (ctx.modelAgent.rotation.y === 0) {
-      ctx.modelAgent.position.z += 1;
+      ctx.modelAgent.position.z += ctx.velocity;
     } else if (ctx.modelAgent.rotation.y === (Math.PI / 2)) {
-      ctx.modelAgent.position.x += 1;
+      ctx.modelAgent.position.x += ctx.velocity;
     } else if (ctx.modelAgent.rotation.y === Math.PI) {
-      ctx.modelAgent.position.z -= 1;
+      ctx.modelAgent.position.z -= ctx.velocity;
     } else if (ctx.modelAgent.rotation.y === ((3*Math.PI) / 2)){
-      ctx.modelAgent.position.x -= 1;
+      ctx.modelAgent.position.x -= ctx.velocity;
     }
   }
 
@@ -70,23 +72,29 @@ class RoverAgent {
       if(this.rockStack > 0) {
         console.log('A total of ' + this.rockStack.toString() + ' more rocks have been left at the station.');
         this.rocksCollected += this.rockStack;
-        console.log('The total of rocks at the station is: ' + this.rocksCollected.toString() + ' rocks.');
-        this.rockStack = 0;
+        console.log('The total of rocks left by this agent at the station is: ' + this.rocksCollected.toString() + ' rocks.');
+        return true;
       }
     }
+    return false;
   }
 
   //Cuando se colisiona con una roca
   updateRock(col){
     if(this.modelAgent.collider.intersectsBox(col)){
-      if(this.rockStack >= this.rockLimit){
-        console.log('Rock stack limit has been already reached, agent must go to the station!');
+      if(this.rockStack == this.rockLimit){
         return false;
       }
+      else {
+        this.rockStack += 1;
+        console.log('Rock stack has ' + this.rockStack.toString() + ' rocks');
+        if(this.rockStack == this.rockLimit) {
+          console.log('Rock stack limit has been already reached, agent must go to the station!');
+          this.full = true;
+        }
+        return true;
+      }
       //console.log("Rock Found!!!");
-      this.rockStack += 1;
-      console.log('Rock stack has ' + this.rockStack.toString() + ' rocks');
-      return true;
     }
     return false;
   }
@@ -103,13 +111,30 @@ class RoverAgent {
   avoidObstacle(selection){
     const ctx = this;
     if (ctx.modelAgent.rotation.y === 0 || ctx.modelAgent.rotation.y === Math.PI) {
+
+      if(ctx.modelAgent.rotation.y === 0){
+        ctx.modelAgent.position.z -= 5;
+      }
+      else if(ctx.modelAgent.rotation.y === Math.PI){
+        ctx.modelAgent.position.z += 5;
+      }
+
       if (selection === 0){
         ctx.modelAgent.rotation.y = Math.PI / 2;
       }
       else{
         ctx.modelAgent.rotation.y = (3*Math.PI) / 2;
       }
+
     } else if (ctx.modelAgent.rotation.y === (Math.PI / 2) || ctx.modelAgent.rotation.y === ((3*Math.PI) / 2)) {
+
+      if(ctx.modelAgent.rotation.y === (Math.PI / 2)){
+        ctx.modelAgent.position.x -= 5;
+      }
+      else if(ctx.modelAgent.rotation.y === ((3*Math.PI) / 2)){
+        ctx.modelAgent.position.x += 5;
+      }
+
       if (selection === 0){
         ctx.modelAgent.rotation.y = 0;
       }
