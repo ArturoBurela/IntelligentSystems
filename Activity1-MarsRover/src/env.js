@@ -161,7 +161,7 @@ class MarsEnvironment {
   cloneRocks(no_of_rocks) {
     const temp_env = this;
     return new Promise(resolve => {
-      console.log('rocas!');
+      //console.log('rocas!');
 
       setTimeout(() => {
         var x;

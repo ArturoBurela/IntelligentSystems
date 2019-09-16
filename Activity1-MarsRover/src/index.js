@@ -91,7 +91,7 @@ const animate = function() {
         {
           if(agents[i].updateRock(env.rocksColliders[x])) {
             //Remover el collider y el mesh de la roca en la variable env
-            console.log('The agent got a rock!');
+            //console.log('The agent got a rock!');
             scene.remove(scene.getObjectByName(env.rocksColliders[x].name));
             env.rocksColliders.splice(x,1);
             env.rocks.splice(x,1);
@@ -100,6 +100,13 @@ const animate = function() {
         for(x = 0; x < env.ufos.length; x++)
         {
           agents[i].updateObstacle(env.ufos[x]);
+        }
+
+        for(x = 0; x < agents.length; x++)
+        {
+          if(x != i){
+            agents[i].updateOtherAgent(agents[x].modelAgent.collider);
+          }
         }
 
         if(agents[i].full == true && Math.floor(clock.getElapsedTime()) % 5 === 0){

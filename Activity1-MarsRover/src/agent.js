@@ -15,7 +15,7 @@ class RoverAgent {
     this.rockLimit = 6;
     this.rocksCollected = 0;
     this.full = false;
-    this.velocity = 2;
+    this.velocity = 3;
     this.rotate = true;
   }
 
@@ -94,9 +94,9 @@ class RoverAgent {
       }
       else {
         this.rockStack += 1;
-        console.log('Rock stack has ' + this.rockStack.toString() + ' rocks');
+        //console.log('Rock stack has ' + this.rockStack.toString() + ' rocks');
         if(this.rockStack == this.rockLimit) {
-          console.log('Rock stack limit has been already reached, agent must go to the station!');
+          //console.log('Rock stack limit has been already reached, agent must go to the station!');
           this.full = true;
         }
         return true;
@@ -109,7 +109,15 @@ class RoverAgent {
   //Cuando se colisiona con un obstáculo
   updateObstacle(col){
     if(this.modelAgent.collider.intersectsBox(col)){
-      console.log("Obstacle Found!!!");
+      //console.log("Obstacle Found!!!");
+      var selection = Math.round(Math.random());
+      this.avoidObstacle(selection);
+    }
+  }
+
+  updateOtherAgent(col){
+    if(this.modelAgent.collider.intersectsBox(col)){
+      //console.log("Collision with another agent detected, changing direction.");
       var selection = Math.round(Math.random());
       this.avoidObstacle(selection);
     }
@@ -155,7 +163,7 @@ class RoverAgent {
     const ctx = this;
     if(ctx.modelAgent.position.z >= 1000 || ctx.modelAgent.position.z <= -1600 ||
        ctx.modelAgent.position.x >= 1150 || ctx.modelAgent.position.x <= -1150){
-         console.log('Limit of map has been reached, go other way');
+         //console.log('Limit of map has been reached, go other way');
          ctx.avoidObstacle(Math.round(Math.random()));
     }
   }
