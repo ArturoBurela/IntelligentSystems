@@ -77,9 +77,9 @@ class RoverAgent {
     if(this.modelAgent.collider.intersectsBox(collider)){
       //console.log("lol");
       if(this.rockStack > 0) {
-        console.log('A total of ' + this.rockStack.toString() + ' more rocks have been left at the station.');
+        //console.log('A total of ' + this.rockStack.toString() + ' more rocks have been left at the station.');
         this.rocksCollected += this.rockStack;
-        console.log('The total of rocks left by this agent at the station is: ' + this.rocksCollected.toString() + ' rocks.');
+        //console.log('The total of rocks left by this agent at the station is: ' + this.rocksCollected.toString() + ' rocks.');
         return true;
       }
     }
