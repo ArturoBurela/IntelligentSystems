@@ -75,6 +75,11 @@ const animate = function() {
     {
       agent.updateRock(env.rocksColliders[x]);
     }
+    for(x = 0; x < env.ufos.length; x++)
+    {
+      agent.updateObstacle(env.ufos[x]);
+    }
+
     if(Math.floor(clock.getElapsedTime()) % 10 === 0 && clock.getElapsedTime() > 1 && rotate){
       rotate = false;
       agent.rotateAgent(rotateRand);

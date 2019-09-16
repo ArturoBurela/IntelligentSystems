@@ -187,6 +187,10 @@ class MarsEnvironment {
           hrbox.position.set(rock.position);
           hrbox.visible = true;
 
+          rock.name = 'Rock' + x.toString();
+          rbox.name = 'Rock' + x.toString();
+          hrbox.name = 'Rock' + x.toString();
+
           temp_env.rocks.push(rock);
           temp_env.scene.add(rock);
           temp_env.scene.add(hrbox);
@@ -315,11 +319,37 @@ class MarsEnvironment {
     });
   }
 
+  removeRocksInObstacles(){
+    const temp_env = this;
+    var x;
+    var y;
+    var removed = [];
+
+    for(y = 0; y < temp_env.rocksColliders.length; y++) {
+      for(x = 0; x < temp_env.ufos.length; x++) {
+        if(temp_env.ufos[x].intersectsBox(temp_env.rocksColliders[y])){
+          console.log('Rock Removed!');
+          removed.push(y);
+        }
+      }
+    }
+
+    for (var i = removed.length -1; i >= 0; i--) {
+      //console.log(temp_env.rocksColliders[removed[i]]);
+      temp_env.scene.remove(temp_env.scene.getObjectByName(temp_env.rocksColliders[removed[i]].name));
+      temp_env.rocksColliders.splice(removed[i],1);
+      temp_env.rocks.splice(removed[i],1);
+    }
+    //console.log('hay estas rocas ahora:' + temp_env.rocksColliders.length.toString());
+    //console.log('hay estas rocas ahora en rocks:' + temp_env.rocks.length.toString());
+  }
+
   async loadEnv(x, y){
     await this.loadRockModels();
     await this.cloneRocks(x);
     await this.loadObsModel();
     await this.cloneObs(y);
+    await this.removeRocksInObstacles();
     return x;
   }
 

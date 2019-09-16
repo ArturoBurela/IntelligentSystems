@@ -71,6 +71,13 @@ class RoverAgent {
     }
   }
 
+  updateObstacle(col){
+    if(this.modelAgent.collider.intersectsBox(col)){
+      //console.log("Obstacle Found!!!");
+
+    }
+  }
+
   animate() {
     if(this.modelAgent && this.modelAgent.collider) {
       this.modelAgent.collider.setFromObject(this.modelAgent);
