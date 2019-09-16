@@ -39,9 +39,9 @@ const FOG_COLOR = 0x000000;
 
 class MarsEnvironment {
   constructor(numRocks, numObstacles, multiagent,scene) {
-    this.numRocks = numRocks;
-    this.numObstacles = numObstacles;
     this.scene = scene;
+    this.rocksNum = numRocks;
+    this.obstaclesNum = numObstacles;
     this.multiagent = multiagent;
     this.addLights();
     // this.addGround();
@@ -56,7 +56,7 @@ class MarsEnvironment {
     this.messages = [];
     //Number of rocks and obstacles to spawn
     this.loadEnv(numRocks,numObstacles).then((res) => {
-      console.log(res + ' rocks spawned');
+      //console.log(res + ' rocks spawned');
     });
     this.marsBase = null;
     this.helperBox = null;
@@ -342,7 +342,9 @@ class MarsEnvironment {
       temp_env.scene.remove(temp_env.scene.getObjectByName(temp_env.rocksColliders[removed[i]].name));
       temp_env.rocksColliders.splice(removed[i],1);
       temp_env.rocks.splice(removed[i],1);
+      temp_env.rocksNum -= 1;
     }
+    console.log(temp_env.rocksNum.toString() + ' rocks spawned');
     //console.log('hay estas rocas ahora:' + temp_env.rocksColliders.length.toString());
     //console.log('hay estas rocas ahora en rocks:' + temp_env.rocks.length.toString());
   }

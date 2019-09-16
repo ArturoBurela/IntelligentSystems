@@ -18,6 +18,7 @@ class RoverAgent {
     this.rockLimit = 6;
     this.rocksCollected = 0;
     this.full = false;
+    this.stop = false;
     this.velocity = 7;
     this.isCarrier = carrier;
     this.rotate = true;
@@ -46,6 +47,9 @@ class RoverAgent {
 
   moveAgent() {
     const ctx = this;
+    if(ctx.stop == true){
+      return;
+    }
     //console.log('rotation of agent is: ' + ctx.modelAgent.rotation.y.toString());
     if (ctx.modelAgent.rotation.y === 0) {
       ctx.modelAgent.position.z += ctx.velocity;
@@ -99,9 +103,10 @@ class RoverAgent {
         }
         else {
           this.rockStack += 1;
-          console.log('Rock stack has ' + this.rockStack.toString() + ' rocks');
+          this.scene.rocksGathered += 1;
+          //console.log('Rock stack has ' + this.rockStack.toString() + ' rocks');
           if (this.rockStack == this.rockLimit) {
-            console.log('Rock stack limit has been already reached, agent must go to the station!');
+            //console.log('Rock stack limit has been already reached, agent must go to the station!');
             this.full = true;
           }
           return true;
@@ -120,8 +125,8 @@ class RoverAgent {
             this.sendMessage(col.position);
             return false;
           }
-        } 
-      } 
+        }
+      }
       else if (this.multiagent && this.isCarrier){
         if (this.modelAgent.collider.intersectsBox(col)) {
           if (this.rockStack === this.rockLimit) {
@@ -140,7 +145,7 @@ class RoverAgent {
         return false;
       }
     }
-    
+
   }
 
   //Cuando se colisiona con un obstáculo

@@ -26,6 +26,7 @@ const context = WEBGL.isWebGL2Available() ? canvas.getContext('webgl2', { alpha:
 // Create basic ThreeJS objects: scene, camera, controls and renderer
 var scene = new Scene();
 scene.agentsLoaded = 0;
+scene.rocksGathered = 0;
 var clock = new Clock();
 var multiagente = true;
 const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
@@ -58,8 +59,10 @@ controls.maxDistance = 3500;
 //
 // window.addEventListener( 'resize', onWindowResize, false );
 
-// Instantiate Environment
-var env = new MarsEnvironment(1, 1, multiagente,scene);
+var rocksSpawned = 20;
+var obstaclesSpawned = 5;
+// Instantiate Environment with number of rocks and number of obstacles
+var env = new MarsEnvironment(rocksSpawned, obstaclesSpawned, multiagente, scene);
 // Instantiate Agent?
 var agents = [];
 //const agent = new RoverAgent(scene);
@@ -67,6 +70,8 @@ var no_of_agents = 6;
 //let rotate = true;
 var x;
 var i;
+var finished = false;
+var end = false;
 // animate the scene
 const animate = function () {
   requestAnimationFrame(animate);
@@ -82,6 +87,27 @@ const animate = function () {
     }
 
     if (env.marsBase) {
+
+      if(!end && env.totalRocks == env.rocksNum){
+        console.log('the search is over, all rocks have been collected. SIMULATION ENDED');
+        console.log('THIS SIMULATION TOOK: ' + Math.floor(clock.getElapsedTime()).toString() + ' seconds.');
+        for(x = 0; x < agents.length; x++)
+        {
+          agents[x].stop = true;
+        }
+        end = true;
+      }
+
+      if(!finished && env.rocksNum == scene.rocksGathered){
+        console.log('Rocks have been collected, all agents must return to the station right now.');
+        for(x = 0; x < agents.length; x++)
+        {
+          agents[x].full = true;
+        }
+        finished = true;
+      }
+
+
       for(i = 0; i < no_of_agents; i++){
 
         agents[i].moveAgent();
@@ -129,7 +155,7 @@ const animate = function () {
           }
         }
 
-        if(Math.floor(clock.getElapsedTime()) % 10 === 0 && clock.getElapsedTime() > 1 && agents[i].rotate && agents[i].full == false){
+        if(Math.floor(clock.getElapsedTime()) % 10 === 0 && clock.getElapsedTime() > 1 && agents[i].rotate && agents[i].full == false && agents[i].stop == false){
           agents[i].rotate = false;
           agents[i].rotateAgent();
         } else if (Math.floor(clock.getElapsedTime()) % 10 === 0 && !agents[i].rotate) {
