@@ -34,13 +34,14 @@ class RoverAgent {
 
   moveAgent(randomNum) {
     const ctx = this;
-    if (Math.floor(ctx.modelAgent.rotation.y) === 0 || Math.floor(ctx.modelAgent.rotation.y) === 360) {
+    //console.log('rotation of agent is: ' + ctx.modelAgent.rotation.y.toString());
+    if (Math.floor(ctx.modelAgent.rotation.y) === 0) {
       ctx.modelAgent.position.z += 1;
-    } else if (Math.floor(ctx.modelAgent.rotation.y) === 90) {
+    } else if (ctx.modelAgent.rotation.y === (Math.PI / 2)) {
       ctx.modelAgent.position.x += 1;
-    } else if (Math.floor(ctx.modelAgent.rotation.y) === 180) {
+    } else if (ctx.modelAgent.rotation.y === Math.PI) {
       ctx.modelAgent.position.z -= 1;
-    } else if (Math.floor(ctx.modelAgent.rotation.y) === 270){
+    } else if (ctx.modelAgent.rotation.y === ((3*Math.PI) / 2)){
       ctx.modelAgent.position.x -= 1;
     }
   }
@@ -54,11 +55,11 @@ class RoverAgent {
     if (randomNum >= 0 && randomNum < 0.25) {
       ctx.modelAgent.rotation.y = 0;
     } else if (randomNum >= 0.25 && randomNum < 0.5) {
-      ctx.modelAgent.rotation.y = 90;
+      ctx.modelAgent.rotation.y = Math.PI / 2;
     } else if (randomNum >= 0.5 && randomNum < 0.75) {
-      ctx.modelAgent.rotation.y = 180;
+      ctx.modelAgent.rotation.y = Math.PI;
     } else {
-      ctx.modelAgent.rotation.y = 270;
+      ctx.modelAgent.rotation.y = (3*Math.PI) / 2;
     }
   }
 
@@ -84,7 +85,7 @@ class RoverAgent {
       }
       //console.log("Rock Found!!!");
       this.rockStack += 1;
-      console.log('Rock stack has ' + this.rockStack.toString() + ' rocas');
+      console.log('Rock stack has ' + this.rockStack.toString() + ' rocks');
       return true;
     }
     return false;
