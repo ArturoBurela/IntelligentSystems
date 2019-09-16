@@ -78,10 +78,10 @@ class MarsEnvironment {
       ctx.newBox = new Box3().setFromPoints(ctx.vectors);
       ctx.marsBase = gltf.scene;
       ctx.marsBase.collider = ctx.newBox;
-      ctx.helperBox = new Box3Helper(ctx.newBox);
-      ctx.helperBox.visible = true;
+      //ctx.helperBox = new Box3Helper(ctx.newBox);
+      //ctx.helperBox.visible = true;
       ctx.scene.add(ctx.marsBase);
-      ctx.scene.add(ctx.helperBox);
+      //ctx.scene.add(ctx.helperBox);
     }, undefined, function(error) {
       console.error(error);
     });
