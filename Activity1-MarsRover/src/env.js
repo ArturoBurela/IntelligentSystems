@@ -192,6 +192,7 @@ class MarsEnvironment {
           rock.name = 'Rock' + x.toString();
           rbox.name = 'Rock' + x.toString();
           hrbox.name = 'Rock' + x.toString();
+          rbox.position = rock.position;
 
           temp_env.rocks.push(rock);
           temp_env.scene.add(rock);
@@ -344,6 +345,10 @@ class MarsEnvironment {
     }
     //console.log('hay estas rocas ahora:' + temp_env.rocksColliders.length.toString());
     //console.log('hay estas rocas ahora en rocks:' + temp_env.rocks.length.toString());
+  }
+
+  updateMessages() {
+    console.log([...new Set(this.messages)]);
   }
 
   async loadEnv(x, y){

@@ -6,12 +6,12 @@ import { Box3 } from "three";
 import { Tween } from "@tweenjs/tween.js";
 
 class RoverAgent {
-  constructor(scene, x, y, z) {
+  constructor(scene, x, y, z, carrier, multiagent, env) {
     this.scene = scene;
     // Instantiate a loader GLTF is prefered
     this.loader = new GLTFLoader();
     this.modelAgent;
-
+    this.env = env;
     this.multiagent = multiagent;
     this.addAgent(x, y, z, scene);
     this.rockStack = 0;
@@ -112,7 +112,15 @@ class RoverAgent {
     }
     else {
       if(this.multiagent && !this.isCarrier){
-        this.sendMessage(this.modelAgent.position);
+        if (this.modelAgent.collider.intersectsBox(col)) {
+          if (this.rockStack === this.rockLimit) {
+            return false;
+          }
+          else {
+            this.sendMessage(col.position);
+            return false;
+          }
+        } 
       } 
       else if (this.multiagent && this.isCarrier){
         if (this.modelAgent.collider.intersectsBox(col)) {
@@ -128,7 +136,6 @@ class RoverAgent {
             }
             return true;
           }
-          //console.log("Rock Found!!!");
         }
         return false;
       }
@@ -191,8 +198,10 @@ class RoverAgent {
   }
 
   sendMessage(position) {
-    console.log("Rock at position", position);
-    return position;
+    // console.log("Rock at position", position);
+    this.env.messages.push(position);
+    // console.log(this.env.messages);
+    // return position;
   }
 
   goForRock(position) {

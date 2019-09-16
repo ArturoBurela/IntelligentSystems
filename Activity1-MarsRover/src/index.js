@@ -58,7 +58,7 @@ controls.maxDistance = 3500;
 // window.addEventListener( 'resize', onWindowResize, false );
 
 // Instantiate Environment
-var env = new MarsEnvironment(1, 1, scene);
+var env = new MarsEnvironment(1, 1, multiagente,scene);
 // Instantiate Agent?
 var agents = [];
 //const agent = new RoverAgent(scene);
@@ -73,6 +73,7 @@ const animate = function () {
   if(scene.agentsLoaded == no_of_agents) {
     // Call to env animate
     env.animate();
+    env.updateMessages();
 
     for(i = 0; i < no_of_agents; i++){
       agents[i].animate();
@@ -135,9 +136,9 @@ const animate = function () {
 
 };
 
-function loadAgent(a) {
+function loadAgent(a, isCarrier) {
   return new Promise(resolve => {
-    const newAgent = new RoverAgent(scene, (-642 + (233 * a)), 25, -250);
+    const newAgent = new RoverAgent(scene, (-642 + (233 * a)), 25, -250, isCarrier, env.multiagent, env);
     agents.push(newAgent);
     resolve();
   });
@@ -146,7 +147,15 @@ function loadAgent(a) {
 async function loadAll() {
   var i;
   for(i = 0; i < no_of_agents; i++){
-    await loadAgent(i);
+    if (multiagente) {
+      if (i < 3) {
+        await loadAgent(i, false);
+      } else {
+        await loadAgent(i, true);
+      }
+    } else {
+      await loadAgent(i,false);
+    }
   }
 }
 
