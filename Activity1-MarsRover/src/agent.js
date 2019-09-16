@@ -19,7 +19,7 @@ class RoverAgent {
   addAgent() {
     const ctx = this;
     this.loader.load('assets/rover.glb', function (gltf) {
-      gltf.scene.position.z = -400;
+      gltf.scene.position.z = -250;
       gltf.scene.position.y = 25;
       gltf.scene.scale.set(50,50,50);
       gltf.scene.rotation.set(0,0,0);
@@ -35,7 +35,7 @@ class RoverAgent {
   moveAgent(randomNum) {
     const ctx = this;
     //console.log('rotation of agent is: ' + ctx.modelAgent.rotation.y.toString());
-    if (Math.floor(ctx.modelAgent.rotation.y) === 0) {
+    if (ctx.modelAgent.rotation.y === 0) {
       ctx.modelAgent.position.z += 1;
     } else if (ctx.modelAgent.rotation.y === (Math.PI / 2)) {
       ctx.modelAgent.position.x += 1;
@@ -93,9 +93,25 @@ class RoverAgent {
 
   //Cuando se colisiona con un obstáculo
   updateObstacle(col){
+    const ctx = this;
     if(this.modelAgent.collider.intersectsBox(col)){
-      //console.log("Obstacle Found!!!");
-
+      console.log("Obstacle Found!!!");
+      var selection = Math.round(Math.random());
+      if (ctx.modelAgent.rotation.y === 0 || ctx.modelAgent.rotation.y === Math.PI) {
+        if (selection === 0){
+          ctx.modelAgent.rotation.y = Math.PI / 2;
+        }
+        else{
+          ctx.modelAgent.rotation.y = (3*Math.PI) / 2;
+        }
+      } else if (ctx.modelAgent.rotation.y === (Math.PI / 2) || ctx.modelAgent.rotation.y === ((3*Math.PI) / 2)) {
+        if (selection === 0){
+          ctx.modelAgent.rotation.y = 0;
+        }
+        else{
+          ctx.modelAgent.rotation.y = Math.PI;
+        }
+      }
     }
   }
 
