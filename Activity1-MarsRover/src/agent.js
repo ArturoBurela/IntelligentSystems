@@ -80,10 +80,10 @@ class RoverAgent {
   updateBase(collider) {
     if (this.modelAgent.collider.intersectsBox(collider)) {
       //console.log("lol");
-      if (this.rockStack > 0) {
-        console.log('A total of ' + this.rockStack.toString() + ' more rocks have been left at the station.');
+      if(this.rockStack > 0) {
+        //console.log('A total of ' + this.rockStack.toString() + ' more rocks have been left at the station.');
         this.rocksCollected += this.rockStack;
-        console.log('The total of rocks left by this agent at the station is: ' + this.rocksCollected.toString() + ' rocks.');
+        //console.log('The total of rocks left by this agent at the station is: ' + this.rocksCollected.toString() + ' rocks.');
         return true;
       }
     }
@@ -129,9 +129,9 @@ class RoverAgent {
           }
           else {
             this.rockStack += 1;
-            console.log('Rock stack has ' + this.rockStack.toString() + ' rocks');
+            // console.log('Rock stack has ' + this.rockStack.toString() + ' rocks');
             if (this.rockStack == this.rockLimit) {
-              console.log('Rock stack limit has been already reached, agent must go to the station!');
+              // console.log('Rock stack limit has been already reached, agent must go to the station!');
               this.full = true;
             }
             return true;
@@ -144,9 +144,17 @@ class RoverAgent {
   }
 
   //Cuando se colisiona con un obstáculo
-  updateObstacle(col) {
-    if (this.modelAgent.collider.intersectsBox(col)) {
-      console.log("Obstacle Found!!!");
+  updateObstacle(col){
+    if(this.modelAgent.collider.intersectsBox(col)){
+      //console.log("Obstacle Found!!!");
+      var selection = Math.round(Math.random());
+      this.avoidObstacle(selection);
+    }
+  }
+
+  updateOtherAgent(col){
+    if(this.modelAgent.collider.intersectsBox(col)){
+      //console.log("Collision with another agent detected, changing direction.");
       var selection = Math.round(Math.random());
       this.avoidObstacle(selection);
     }
@@ -192,23 +200,19 @@ class RoverAgent {
     const ctx = this;
     if (ctx.modelAgent.position.z >= 1000 || ctx.modelAgent.position.z <= -1600 ||
       ctx.modelAgent.position.x >= 1150 || ctx.modelAgent.position.x <= -1150) {
-      console.log('Limit of map has been reached, go other way');
+      // console.log('Limit of map has been reached, go other way');
       ctx.avoidObstacle(Math.round(Math.random()));
     }
   }
 
   sendMessage(position) {
-    // console.log("Rock at position", position);
     this.env.messages.push(position);
-    // console.log(this.env.messages);
-    // return position;
   }
 
   goForRock(position) {
     const ctx = this;
     if(ctx.isCarrier){
       new Tween().to(position, 5000)
-
     }
   }
 

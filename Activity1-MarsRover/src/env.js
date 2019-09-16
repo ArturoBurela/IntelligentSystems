@@ -55,7 +55,7 @@ class MarsEnvironment {
     this.ufos = [];
     this.messages = [];
     //Number of rocks and obstacles to spawn
-    this.loadEnv(150,7).then((res) => {
+    this.loadEnv(numRocks,numObstacles).then((res) => {
       console.log(res + ' rocks spawned');
     });
     this.marsBase = null;
@@ -82,10 +82,10 @@ class MarsEnvironment {
       ctx.newBox = new Box3().setFromPoints(ctx.vectors);
       ctx.marsBase = gltf.scene;
       ctx.marsBase.collider = ctx.newBox;
-      ctx.helperBox = new Box3Helper(ctx.newBox);
-      ctx.helperBox.visible = true;
+      //ctx.helperBox = new Box3Helper(ctx.newBox);
+      //ctx.helperBox.visible = true;
       ctx.scene.add(ctx.marsBase);
-      ctx.scene.add(ctx.helperBox);
+      //ctx.scene.add(ctx.helperBox);
     }, undefined, function(error) {
       console.error(error);
     });
@@ -163,7 +163,7 @@ class MarsEnvironment {
   cloneRocks(no_of_rocks) {
     const temp_env = this;
     return new Promise(resolve => {
-      console.log('rocas!');
+      //console.log('rocas!');
 
       setTimeout(() => {
         var x;
@@ -185,18 +185,18 @@ class MarsEnvironment {
           //rock.position.set( ((Math.floor(Math.random() * 201)-100) * 20), 30, ((Math.floor(Math.random() * 201)-100) * 20));
 
           var rbox = new Box3().setFromObject(rock);
-          var hrbox = new BoxHelper(rock, 0x00ff00);
-          hrbox.position.set(rock.position);
-          hrbox.visible = true;
+          //var hrbox = new BoxHelper(rock, 0x00ff00);
+          //hrbox.position.set(rock.position);
+          //hrbox.visible = true;
 
           rock.name = 'Rock' + x.toString();
           rbox.name = 'Rock' + x.toString();
-          hrbox.name = 'Rock' + x.toString();
           rbox.position = rock.position;
+          //hrbox.name = 'Rock' + x.toString();
 
           temp_env.rocks.push(rock);
           temp_env.scene.add(rock);
-          temp_env.scene.add(hrbox);
+          //temp_env.scene.add(hrbox);
           temp_env.rocksColliders.push(rbox);
         }
         resolve(no_of_rocks);
@@ -235,7 +235,7 @@ class MarsEnvironment {
                 resolve();
             },
             function ( xhr ) {
-                console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+                //console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
             },
             // called when loading has errors
             function ( error ) {
@@ -278,7 +278,7 @@ class MarsEnvironment {
               resolve();
           },
           function ( xhr ) {
-              console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+              //console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
           },
           // called when loading has errors
           function ( error ) {
@@ -309,12 +309,12 @@ class MarsEnvironment {
             newUfo.position.set( (Math.floor(Math.random() * 951) * xside), -35, (Math.floor(Math.random() * 501)+250));
           }
           var ubox = new Box3().setFromObject(newUfo);
-          var hubox = new BoxHelper(newUfo, 0x00ff00);
-          hubox.position.set(newUfo.position);
-          hubox.visible = true;
+          //var hubox = new BoxHelper(newUfo, 0x00ff00);
+          //hubox.position.set(newUfo.position);
+          //hubox.visible = true;
 
           temp_env.scene.add(newUfo);
-          temp_env.scene.add(hubox);
+          //temp_env.scene.add(hubox);
           temp_env.ufos.push(ubox);
         }
         resolve(no_of_ufos);
@@ -331,7 +331,7 @@ class MarsEnvironment {
     for(y = 0; y < temp_env.rocksColliders.length; y++) {
       for(x = 0; x < temp_env.ufos.length; x++) {
         if(temp_env.ufos[x].intersectsBox(temp_env.rocksColliders[y])){
-          console.log('Rock Removed!');
+          //console.log('Rock Removed!');
           removed.push(y);
         }
       }

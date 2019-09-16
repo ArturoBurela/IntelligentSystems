@@ -19,7 +19,8 @@ import {
 } from './agent.js';
 
 // Get Canvas
-const canvas = document.createElement('canvas');
+//const canvas = document.createElement( 'canvas' );
+const canvas = document.getElementById("canvas");
 // Try to use WEBGL2, fallback to default context
 const context = WEBGL.isWebGL2Available() ? canvas.getContext('webgl2', { alpha: false }) : canvas.getContext();
 // Create basic ThreeJS objects: scene, camera, controls and renderer
@@ -32,7 +33,7 @@ const renderer = new WebGLRenderer({ canvas: canvas, context: context });
 const controls = new OrbitControls(camera, renderer.domElement);
 // Bind renderer to html
 renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+//document.body.appendChild(renderer.domElement);
 
 // Set camera position
 // camera.position.z = 500;
@@ -72,8 +73,9 @@ const animate = function () {
   renderer.render(scene, camera);
   if(scene.agentsLoaded == no_of_agents) {
     // Call to env animate
-    env.animate();
+    //env.animate();
     env.updateMessages();
+    //env.animate();
 
     for(i = 0; i < no_of_agents; i++){
       agents[i].animate();
@@ -94,7 +96,7 @@ const animate = function () {
         {
           if(agents[i].updateRock(env.rocksColliders[x])) {
             //Remover el collider y el mesh de la roca en la variable env
-            console.log('The agent got a rock!');
+            //console.log('The agent got a rock!');
             scene.remove(scene.getObjectByName(env.rocksColliders[x].name));
             env.rocksColliders.splice(x,1);
             env.rocks.splice(x,1);
@@ -103,6 +105,13 @@ const animate = function () {
         for(x = 0; x < env.ufos.length; x++)
         {
           agents[i].updateObstacle(env.ufos[x]);
+        }
+
+        for(x = 0; x < agents.length; x++)
+        {
+          if(x != i){
+            agents[i].updateOtherAgent(agents[x].modelAgent.collider);
+          }
         }
 
         if(agents[i].full == true && Math.floor(clock.getElapsedTime()) % 5 === 0){
@@ -159,12 +168,6 @@ async function loadAll() {
   }
 }
 
-async function start() {
-  await loadAll();
-
-  return;
-}
-
-start();
+loadAll();
 
 animate();
