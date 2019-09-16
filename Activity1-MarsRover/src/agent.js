@@ -2,136 +2,49 @@ import {
   GLTFLoader
 } from 'three/examples/jsm/loaders/GLTFLoader';
 
-import { Box3, SphereGeometry, Mesh, Object3D, MeshBasicMaterial, Vector3 } from "three";
+import { Box3 } from "three";
 
 class RoverAgent {
   constructor(scene) {
     this.scene = scene;
     // Instantiate a loader GLTF is prefered
     this.loader = new GLTFLoader();
-    this.modelAgent = null;
-    this.turnDown = false; 
-    this.turnUp = false;
-    this.turnRight = false; 
-    this.turnLeft = false;
-    this.agentGroup = null;
-    this.derecha = null;
-    this.izquierda = null;
-    this.arriba =null;
-    this.abajo = null;
-    this.step = 1;
-    this.materials = {
-      dotU: new MeshBasicMaterial({ color: 0x0000ff }), dotD: new MeshBasicMaterial({ color: 0x00ff00 }),
-      dotL: new MeshBasicMaterial({ color: 0xff0000 }), dotR: new MeshBasicMaterial({ color: 0xffffff })
-    };
-    this.hasRock = false;
-    this.basePosition = new Vector3(0,0,0);
+    this.modelAgent;
     this.addAgent();
+    this.rockStack = 0;
+    this.rockLimit = 6;
+    this.rocksCollected = 0;
+    this.full = false;
+    this.velocity = 2;
   }
 
   addAgent() {
     const ctx = this;
     this.loader.load('assets/rover.glb', function (gltf) {
-      gltf.scene.position.z = 0;
-      gltf.scene.position.y = 0;
-      gltf.scene.scale.set(50,50,50);
-      gltf.scene.rotation.y = 0;
+      gltf.scene.position.z = -250;
+      gltf.scene.position.y = 25;
+      gltf.scene.scale.set(50, 50, 50);
+      gltf.scene.rotation.set(0, 0, 0);
       let newBox = new Box3().setFromObject(gltf.scene);
       ctx.modelAgent = gltf.scene;
       ctx.modelAgent.collider = newBox;
-      ctx.agentGroup = new Object3D();
-      ctx.agentGroup.position.set(0,25,-400);
-      ctx.agentGroup.rotation.set(0,0,0);
-      ctx.agentGroup.add(ctx.modelAgent);
-      let dotGeo = new SphereGeometry(5);
-      ctx.derecha = new Mesh(dotGeo,ctx.materials.dotR);
-      ctx.derecha.position.set(ctx.agentGroup.position.x, ctx.agentGroup.position.y, ctx.agentGroup.position.z + 60);
-      ctx.izquierda = new Mesh(dotGeo, ctx.materials.dotL);
-      ctx.izquierda.position.set(ctx.agentGroup.position.x, ctx.agentGroup.position.y, ctx.agentGroup.position.z - 60);
-      ctx.arriba = new Mesh(dotGeo, ctx.materials.dotU);
-      ctx.arriba.position.set(ctx.agentGroup.position.x + 60, ctx.agentGroup.position.y, ctx.agentGroup.position.z);
-      ctx.abajo = new Mesh(dotGeo, ctx.materials.dotD);
-      ctx.abajo.position.set(ctx.agentGroup.position.x - 60, ctx.agentGroup.position.y, ctx.agentGroup.position.z);
-      ctx.scene.add(ctx.derecha);
-      ctx.scene.add(ctx.izquierda);
-      ctx.scene.add(ctx.arriba)
-      ctx.scene.add(ctx.abajo);
-      ctx.scene.add(ctx.agentGroup);
+      ctx.scene.add(ctx.modelAgent);
     }, undefined, function (error) {
       console.error(error);
     });
   }
 
-  moverPuntos(direccion) {
-    switch (direccion) {
-      case 0: //izquierda
-        this.arriba.position.z -= this.step;
-        this.abajo.position.z -= this.step;
-        this.izquierda.position.z -= this.step;
-        this.derecha.position.z -= this.step;
-        break;
-      case 1: //this.derecha
-        this.arriba.position.z += this.step;
-        this.abajo.position.z += this.step;
-        this.izquierda.position.z += this.step;
-        this.derecha.position.z += this.step;
-        break;
-      case 2: //this.abajo
-        this.arriba.position.x -= this.step;
-        this.abajo.position.x -= this.step;
-        this.izquierda.position.x -= this.step;
-        this.derecha.position.x -= this.step;
-        break;
-      case 3: //this.arriba
-        this.arriba.position.x += this.step;
-        this.abajo.position.x += this.step;
-        this.izquierda.position.x += this.step;
-        this.derecha.position.x += this.step;
-        break;
-
-    }
-  }
-
-  checkObstacles() {
-    this.turnUp = true;
-    this.turnRight = true;
-    this.turnLeft = true;
-    this.turnDown = true;
-  }
-
-  moveAgent() {
-    if (this.agentGroup.rotation.y === 0) {
-      this.agentGroup.rotation.y = 0;
-      this.modelAgent.rotation.y = 0;
-      if (this.turnUp) {
-        this.agentGroup.translateX(this.step);
-        this.moverPuntos(3);
-      }
-      this.checkObstacles();
-    } else if (this.agentGroup.rotation.y === Math.PI / 2) {
-      this.agentGroup.rotation.y = Math.PI / 2;
-      // this.modelAgent.rotation.y = Math.PI / 2;
-      if (this.turnLeft) {
-        this.agentGroup.translateX(this.step);
-        this.moverPuntos(0);
-      }
-      this.checkObstacles();
-    } else if (this.agentGroup.rotation.y === -Math.PI / 2) {
-      this.agentGroup.rotation.y = -Math.PI / 2;
-      // this.modelAgent.rotation.y = -Math.PI / 2;
-      if (this.turnRight) {
-        this.agentGroup.translateX(this.step);
-        this.moverPuntos(1);
-      }
-      this.checkObstacles();
-    } else if (this.agentGroup.rotation.y === -Math.PI){
-      this.agentGroup.rotation.y = - Math.PI;
-      this.modelAgent.rotation.y = - Math.PI;
-      if (this.turnDown) {
-        this.agentGroup.translateX(this.step);
-        this.moverPuntos(2);
-      }
-      this.checkObstacles();
+  moveAgent(randomNum) {
+    const ctx = this;
+    //console.log('rotation of agent is: ' + ctx.modelAgent.rotation.y.toString());
+    if (ctx.modelAgent.rotation.y === 0) {
+      ctx.modelAgent.position.z += ctx.velocity;
+    } else if (ctx.modelAgent.rotation.y === (Math.PI / 2)) {
+      ctx.modelAgent.position.x += ctx.velocity;
+    } else if (ctx.modelAgent.rotation.y === Math.PI) {
+      ctx.modelAgent.position.z -= ctx.velocity;
+    } else if (ctx.modelAgent.rotation.y === ((3 * Math.PI) / 2)) {
+      ctx.modelAgent.position.x -= ctx.velocity;
     }
   }
 
@@ -142,38 +55,106 @@ class RoverAgent {
   rotateAgent(randomNum) {
     const ctx = this;
     if (randomNum >= 0 && randomNum < 0.25) {
-      ctx.agentGroup.rotation.y = 0;
-      console.log("arriba");
+      ctx.modelAgent.rotation.y = 0;
     } else if (randomNum >= 0.25 && randomNum < 0.5) {
-      ctx.agentGroup.rotation.y = Math.PI / 2;
-      console.log("izquierda");
+      ctx.modelAgent.rotation.y = Math.PI / 2;
     } else if (randomNum >= 0.5 && randomNum < 0.75) {
-      ctx.agentGroup.rotation.y = -Math.PI;
-      console.log("abajo");
+      ctx.modelAgent.rotation.y = Math.PI;
     } else {
-      ctx.agentGroup.rotation.y = -Math.PI/2;
-      console.log("derecha");
+      ctx.modelAgent.rotation.y = (3 * Math.PI) / 2;
     }
   }
 
+  //Cuando se colisiona con la nave/estación
   updateBase(collider) {
-    if(this.modelAgent.collider.intersectsBox(collider)){
-      console.log("lol");
+    if (this.modelAgent.collider.intersectsBox(collider)) {
+      //console.log("lol");
+      if (this.rockStack > 0) {
+        console.log('A total of ' + this.rockStack.toString() + ' more rocks have been left at the station.');
+        this.rocksCollected += this.rockStack;
+        console.log('The total of rocks left by this agent at the station is: ' + this.rocksCollected.toString() + ' rocks.');
+        return true;
+      }
+    }
+    return false;
+  }
+
+  //Cuando se colisiona con una roca
+  updateRock(col) {
+    if (this.modelAgent.collider.intersectsBox(col)) {
+      if (this.rockStack == this.rockLimit) {
+        return false;
+      }
+      else {
+        this.rockStack += 1;
+        console.log('Rock stack has ' + this.rockStack.toString() + ' rocks');
+        if (this.rockStack == this.rockLimit) {
+          console.log('Rock stack limit has been already reached, agent must go to the station!');
+          this.full = true;
+        }
+        return true;
+      }
+      //console.log("Rock Found!!!");
+    }
+    return false;
+  }
+
+  //Cuando se colisiona con un obstáculo
+  updateObstacle(col) {
+    if (this.modelAgent.collider.intersectsBox(col)) {
+      console.log("Obstacle Found!!!");
+      var selection = Math.round(Math.random());
+      this.avoidObstacle(selection);
     }
   }
 
-  carryRock() {
-  
+  avoidObstacle(selection) {
+    const ctx = this;
+    if (ctx.modelAgent.rotation.y === 0 || ctx.modelAgent.rotation.y === Math.PI) {
+
+      if (ctx.modelAgent.rotation.y === 0) {
+        ctx.modelAgent.position.z -= 5;
+      }
+      else if (ctx.modelAgent.rotation.y === Math.PI) {
+        ctx.modelAgent.position.z += 5;
+      }
+
+      if (selection === 0) {
+        ctx.modelAgent.rotation.y = Math.PI / 2;
+      }
+      else {
+        ctx.modelAgent.rotation.y = (3 * Math.PI) / 2;
+      }
+
+    } else if (ctx.modelAgent.rotation.y === (Math.PI / 2) || ctx.modelAgent.rotation.y === ((3 * Math.PI) / 2)) {
+
+      if (ctx.modelAgent.rotation.y === (Math.PI / 2)) {
+        ctx.modelAgent.position.x -= 5;
+      }
+      else if (ctx.modelAgent.rotation.y === ((3 * Math.PI) / 2)) {
+        ctx.modelAgent.position.x += 5;
+      }
+
+      if (selection === 0) {
+        ctx.modelAgent.rotation.y = 0;
+      }
+      else {
+        ctx.modelAgent.rotation.y = Math.PI;
+      }
+    }
   }
 
-  updateRock(col){
-    if(this.modelAgent.collider.intersectsBox(col)){
-      //console.log("Rock Found!!!");
+  updateLimits() {
+    const ctx = this;
+    if (ctx.modelAgent.position.z >= 1000 || ctx.modelAgent.position.z <= -1600 ||
+      ctx.modelAgent.position.x >= 1150 || ctx.modelAgent.position.x <= -1150) {
+      console.log('Limit of map has been reached, go other way');
+      ctx.avoidObstacle(Math.round(Math.random()));
     }
   }
 
   animate() {
-    if(this.modelAgent && this.modelAgent.collider) {
+    if (this.modelAgent && this.modelAgent.collider) {
       this.modelAgent.collider.setFromObject(this.modelAgent);
     }
   }

@@ -31,11 +31,6 @@ import {
   OBJLoader
 } from 'three/examples/jsm/loaders/OBJLoader';
 
-import {
-  FBXLoader
-} from 'three/examples/jsm/loaders/FBXLoader';
-
-import { cloneFbx } from '../utils/cloneFBX.js';
 
 const BACKGROUND_COLOR = 0x000000;
 const AMBIENT_COLOR = 0x000000;
@@ -58,7 +53,7 @@ class MarsEnvironment {
     this.ufoModel = null;
     this.ufos = [];
     //Number of rocks and obstacles to spawn
-    this.loadEnv(75,5).then((res) => {
+    this.loadEnv(150,7).then((res) => {
       console.log(res + ' rocks spawned');
     });
     this.marsBase = null;
@@ -74,8 +69,8 @@ class MarsEnvironment {
       new Vector3(700, 0, -300),
       new Vector3(-700, 0, -300),
       new Vector3(-700, 0, 0),
-
     ];
+    this.totalRocks = 0;
   }
 
   addMarsBase() {
@@ -174,12 +169,27 @@ class MarsEnvironment {
           var model_no = Math.floor(Math.random() * 6);
 
           var rock = temp_env.rockModels[model_no].clone();
-          rock.position.set( ((Math.floor(Math.random() * 201)-100) * 20), 35, ((Math.floor(Math.random() * 201)-100) * 20));
+          var zside = Math.random() < 0.5 ? -1 : 1;
+          var xside = Math.random() < 0.5 ? -1 : 1;
+          //negative
+          if (zside < 0){
+            rock.position.set( (Math.floor(Math.random() * 1151) * xside), 30, ((Math.floor(Math.random() * 1101)+500) * zside));
+          }
+          //Positive
+          else {
+            rock.position.set( (Math.floor(Math.random() * 1151) * xside), 30, (Math.floor(Math.random() * 751)+250));
+          }
+
+          //rock.position.set( ((Math.floor(Math.random() * 201)-100) * 20), 30, ((Math.floor(Math.random() * 201)-100) * 20));
 
           var rbox = new Box3().setFromObject(rock);
           var hrbox = new BoxHelper(rock, 0x00ff00);
           hrbox.position.set(rock.position);
           hrbox.visible = true;
+
+          rock.name = 'Rock' + x.toString();
+          rbox.name = 'Rock' + x.toString();
+          hrbox.name = 'Rock' + x.toString();
 
           temp_env.rocks.push(rock);
           temp_env.scene.add(rock);
@@ -259,7 +269,7 @@ class MarsEnvironment {
                   }
               } );
 
-              object.scale.set(6,6,6);
+              object.scale.set(4,4,4);
               temp_env.ufoModel = object;
 
               resolve();
@@ -278,15 +288,23 @@ class MarsEnvironment {
   cloneObs(no_of_ufos) {
     const temp_env = this;
     return new Promise(resolve => {
-      console.log('ufos!');
+      //console.log('ufos!');
 
       setTimeout(() => {
         var x;
         for(x = 0; x < no_of_ufos; x++) {
 
           var newUfo = temp_env.ufoModel.clone();
-          newUfo.position.set( ((Math.floor(Math.random() * 201)-100) * 20), 15, ((Math.floor(Math.random() * 201)-100) * 20));
-
+          var zside = Math.random() < 0.5 ? -1 : 1;
+          var xside = Math.random() < 0.5 ? -1 : 1;
+          //negative
+          if (zside < 0){
+            newUfo.position.set( (Math.floor(Math.random() * 951) * xside), -35, ((Math.floor(Math.random() * 851)+500) * zside));
+          }
+          //Positive
+          else {
+            newUfo.position.set( (Math.floor(Math.random() * 951) * xside), -35, (Math.floor(Math.random() * 501)+250));
+          }
           var ubox = new Box3().setFromObject(newUfo);
           var hubox = new BoxHelper(newUfo, 0x00ff00);
           hubox.position.set(newUfo.position);
@@ -301,11 +319,37 @@ class MarsEnvironment {
     });
   }
 
+  removeRocksInObstacles(){
+    const temp_env = this;
+    var x;
+    var y;
+    var removed = [];
+
+    for(y = 0; y < temp_env.rocksColliders.length; y++) {
+      for(x = 0; x < temp_env.ufos.length; x++) {
+        if(temp_env.ufos[x].intersectsBox(temp_env.rocksColliders[y])){
+          console.log('Rock Removed!');
+          removed.push(y);
+        }
+      }
+    }
+
+    for (var i = removed.length -1; i >= 0; i--) {
+      //console.log(temp_env.rocksColliders[removed[i]]);
+      temp_env.scene.remove(temp_env.scene.getObjectByName(temp_env.rocksColliders[removed[i]].name));
+      temp_env.rocksColliders.splice(removed[i],1);
+      temp_env.rocks.splice(removed[i],1);
+    }
+    //console.log('hay estas rocas ahora:' + temp_env.rocksColliders.length.toString());
+    //console.log('hay estas rocas ahora en rocks:' + temp_env.rocks.length.toString());
+  }
+
   async loadEnv(x, y){
     await this.loadRockModels();
     await this.cloneRocks(x);
     await this.loadObsModel();
     await this.cloneObs(y);
+    await this.removeRocksInObstacles();
     return x;
   }
 
