@@ -65,6 +65,7 @@ var obstaclesSpawned = 5;
 var env = new MarsEnvironment(rocksSpawned, obstaclesSpawned, multiagente, scene);
 // Instantiate Agent?
 var agents = [];
+scene.agents = agents;
 //const agent = new RoverAgent(scene);
 var no_of_agents = 6;
 //let rotate = true;
@@ -79,18 +80,18 @@ const animate = function () {
   if(scene.agentsLoaded == no_of_agents) {
     // Call to env animate
     //env.animate();
-    let mensajes = env.updateMessages();
+    //let mensajes = env.updateMessages();
     //env.animate();
 
     for(i = 0; i < no_of_agents; i++){
       agents[i].animate();
-      if (agents[i].isCarrier && mensajes.length > 0) { // Mensajes en el ambiente para saber posiciones
+      /*if (agents[i].isCarrier && mensajes.length > 0) { // Mensajes en el ambiente para saber posiciones
         if (agents[i].positions.length < 1){ // una roca por agente
           agents[i].positions.push(mensajes[0]); // agregar mensaje a agente
           mensajes.shift(); // eliminar de mensajes
           agents[i].positions = [...new Set(agents[i].positions)]; // que sea único
         }
-      }
+      }*/
     }
 
     if (env.marsBase) {
@@ -131,11 +132,22 @@ const animate = function () {
             //Remover el collider y el mesh de la roca en la variable env
             //console.log('The agent got a rock!');
             scene.remove(scene.getObjectByName(env.rocksColliders[x].name));
+
+            if(agents[i].positions.length > 0) {
+              if (agents[i].positions[0].x > env.rocksColliders[x].position.x - 10 && agents[i].positions[0].x < env.rocksColliders[x].position.x + 10
+                  && agents[i].positions[0].z > env.rocksColliders[x].position.z - 10 && agents[i].positions[0].z < env.rocksColliders[x].position.z + 10) {
+                var a;
+                for(a = 0; a < agents.length; a++){
+                  agents[a].deletePosition(env.rocksColliders[x].position);
+                  //agents[a].positions.shift();
+                }
+                //console.log('se borró una posición');
+              }
+            }
+
             env.rocksColliders.splice(x,1);
             env.rocks.splice(x,1);
-            if (agents[i].positions[0] === env.rocksColliders[x].position) {
-              agents[i].positions.shift();
-            }
+
 
           }
         }
@@ -152,7 +164,7 @@ const animate = function () {
         }
 
         for (x = 0; x < agents.length; x++) {
-          if (agents[i].isCarrier && agents[i].positions.length > 0) {
+          if (agents[i].isCarrier && agents[i].positions.length > 0 && Math.floor(clock.getElapsedTime()) % 1.5 === 0) {
             agents[i].goForRock(agents[i].positions[0]);
           }
         }

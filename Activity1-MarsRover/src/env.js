@@ -53,7 +53,7 @@ class MarsEnvironment {
     this.rocksColliders = [];
     this.ufoModel = null;
     this.ufos = [];
-    this.messages = [];
+    //this.messages = [];
     //Number of rocks and obstacles to spawn
     this.loadEnv(numRocks,numObstacles).then((res) => {
       //console.log(res + ' rocks spawned');
@@ -349,10 +349,10 @@ class MarsEnvironment {
     //console.log('hay estas rocas ahora en rocks:' + temp_env.rocks.length.toString());
   }
 
-  updateMessages() {
+  /*updateMessages() {
     let mensajes = [...new Set(this.messages)]; // Posiciones únicas
     return mensajes;
-  }
+  }*/
 
   async loadEnv(x, y){
     await this.loadRockModels();

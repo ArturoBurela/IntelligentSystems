@@ -21,7 +21,7 @@ class RoverAgent {
     this.rocksCollected = 0;
     this.full = false;
     this.stop = false;
-    this.velocity = 7;
+    this.velocity = 3;
     this.isCarrier = carrier;
     this.rotate = true;
     this.positions = [];
@@ -108,6 +108,7 @@ class RoverAgent {
         }
         else {
           this.rockStack += 1;
+          this.scene.rocksGathered += 1;
           // console.log('Rock stack has ' + this.rockStack.toString() + ' rocks');
           if (this.rockStack == this.rockLimit) {
           // console.log('Rock stack limit has been already reached, agent must go to the station!');
@@ -126,11 +127,15 @@ class RoverAgent {
             return false;
           }
           else {
-            this.sendMessage(col.position);
+            if(this.containsPositionAlready(col.position) == false){
+                //this.sendMessage(col.position);
+                //console.log("Se encontró una nueva posición en: (" + col.position.x.toString() + ', ' + col.position.y.toString() + ', ' + col.position.z.toString() + ').' );
+                this.addPositionToAgents(col.position);
+            }
             return false;
           }
-        } 
-      } 
+        }
+      }
       else if (this.multiagent && this.isCarrier){
         if (this.modelAgent.collider.intersectsBox(col)) {
           if (this.rockStack === this.rockLimit) {
@@ -138,6 +143,7 @@ class RoverAgent {
           }
           else {
             this.rockStack += 1;
+            this.scene.rocksGathered += 1;
             // console.log('Rock stack has ' + this.rockStack.toString() + ' rocks');
             if (this.rockStack == this.rockLimit) {
               // console.log('Rock stack limit has been already reached, agent must go to the station!');
@@ -149,7 +155,7 @@ class RoverAgent {
         return false;
       }
     }
-    
+
   }
 
   //Cuando se colisiona con un obstáculo
@@ -214,18 +220,67 @@ class RoverAgent {
     }
   }
 
-  sendMessage(position) {
+  /*sendMessage(position) {
     this.env.messages.push(position); // Agregar mensajes al ambiente
-  }
+  }*/
 
   goForRock(position) {
     const ctx = this;
+    //console.log('moviendose hacia: (' + position.x.toString() + ', ' + position.y.toString() + ', ' + position.z.toString() + ')');
     if(ctx.isCarrier){
-      ctx.move = new Tween(ctx.modelAgent.position);
-      ctx.move.to(position, 5000).start(); // Moverse a la posición de la roca
+
+      if(ctx.modelAgent.position.z > position.z + 6){
+        ctx.modelAgent.rotation.y = Math.PI;
+      }
+      else if(ctx.modelAgent.position.x > position.x + 6){
+        ctx.modelAgent.rotation.y = ((3*Math.PI) / 2);
+      }
+      else if(ctx.modelAgent.position.z < position.z - 6){
+        ctx.modelAgent.rotation.y = 0;
+      }
+      else if(ctx.modelAgent.position.x < position.x - 6){
+        ctx.modelAgent.rotation.y = Math.PI / 2;
+      }
+
+      //ctx.move = new Tween(ctx.modelAgent.position);
+      //ctx.move.to(position, 5000).start(); // Moverse a la posición de la roca
     } else {
       return;
     }
+  }
+
+  containsPositionAlready(pos){
+    const ctx = this;
+    var a;
+    for(a = 0; a < ctx.positions.length; a++){
+      if(ctx.positions[a].x == pos.x && ctx.positions[a].y == pos.y && ctx.positions[a].z == pos.z){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  deletePosition(pos){
+    const ctx = this;
+    var a;
+    for(a = 0; a < ctx.positions.length; a++){
+      if(ctx.positions[a].x == pos.x && ctx.positions[a].y == pos.y && ctx.positions[a].z == pos.z){
+        ctx.positions.splice(a,1);
+        //console.log('se borró la posición en el agente');
+      }
+    }
+  }
+
+  addPositionToAgents(pos){
+    const ctx = this;
+    var a;
+    for(a = 0; a < ctx.scene.agents.length; a++){
+      if(ctx.scene.agents[a].containsPositionAlready(pos) == false){
+        ctx.scene.agents[a].positions.push(pos);
+        //console.log('se añadió la posición en el agente');
+      }
+    }
+
   }
 
   animate() {
