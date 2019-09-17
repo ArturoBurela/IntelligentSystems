@@ -17,6 +17,8 @@
     "webpack-cli": "^3.3.7"
   },
   "dependencies": {
+    "@tweenjs/tween.js": "^18.3.1",
+    "es6-tween": "^5.5.10",
     "three": "^0.107.0"
   }
 }
