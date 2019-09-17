@@ -10,3 +10,6 @@ This is the repository for Intelligent Systems class, this sections contains cha
 
 ## Document
 [Challenge.pdf](https://arturoburela.github.io/IntelligentSystems/MarsRover/Document/reporte_challenge.pdf).
+
+## YouTube Link
+[Simulation Video](https://youtu.be/rC-wP0axsyc).
